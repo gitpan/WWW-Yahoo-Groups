@@ -4,7 +4,7 @@ use Module::Build 0.11;
 
 my $m = Module::Build->new(
     dist_name => 'WWW-Yahoo-Groups',
-    dist_version => '1.7.4',
+    dist_version => '1.7.5',
     license => 'perl',
 
     requires => {

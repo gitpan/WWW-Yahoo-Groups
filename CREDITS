@@ -1,0 +1,15 @@
+CREDITS FOR WWW::Yahoo::Groups 1.7.5
+
+Simon Hanmer for having problems with the module, thus resulting in
+improved error reporting, param validation and corrected prerequisites.
+Since then, Simon also provided a basis for the lists() and
+last_msg_id() methods and is causing me to think harder about my
+exceptions.
+
+Aaron Straup Cope for writing XML::Filter::YahooGroups which
+uses this module for retrieving message bodies to put into RSS.
+
+Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
+
+
+

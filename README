@@ -10,16 +10,15 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.7.4 (10 Oct 2002)
-   - Tabs in MANIFEST now spaces.
-   - loggedin() added. Returns if one is logged in or not.
-   - lists() added. Based on code from Simon Hanmer.
-   - Documentation for list() clarified.
-   - New exceptions 'NotLoggedIn' and 'AlreadyLoggedIn'.
-   - Typo of 'gruop' instead of 'group' fixed.
-   - Tests for lists() and loggedin() added.
-   - login() throws an exception if one is already logged in.
-   - TODO list expanded for better re-login() handling.
+Changes for 1.7.5 (10 Oct 2002)
+   - GPL renamed COPYING (to fit search.cpan.org)
+   - CREDITS file added (generated from POD)
+   - last_msg_id() added. Based on code from Simon Hanmer.
+   - Tests for last_msg_id() added.
+   - Brief note about being a well behaved bot added.
+   - list() ensures appropriate characters in list name.
+   - Automatically sleep() in get(), courtesy autosleep().
+   - Tests for sleep() added.
 
 
 by Iain Truskett.

@@ -33,6 +33,10 @@ few methods and supplying a few extra. As such, any method available in
 C<WWW::Mechanize> is available to C<WWW::Yahoo::Groups>, perhaps
 augmented with extra features.
 
+Try to be a well behaved bot and C<sleep()> for a few seconds (at least)
+after doing things. It's considered polite. There's a method
+C<autosleep()> that should be useful for this.
+
 It is recommended that you use this only if you're the moderator of a
 group, else you will get munged email addresses for everything. If
 there's sufficient demand for semi-automatic address demunging, I'll
@@ -87,7 +91,7 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -182,8 +186,9 @@ sub debug
 
 Fetch a given URL.
 
-If C<debug()> is enabled, then it will displaying a warning showing
-the URL.
+If C<debug()> is enabled, then it will displaying a warning showing the
+URL. If C<autosleep()> has been given an interval, then C<get()> will
+sleep for that interval after successfully fetching a page.
 
     $y->get( 'http://groups.yahoo.com' );
 
@@ -202,8 +207,43 @@ sub get
     X::WWW::Yahoo::Groups::BadFetch->throw(
 	"Unable to fetch $url: ".$self->{res}->message)
 	    if ($self->{res}->is_error);
+    if (my $s = $self->autosleep() )
+    {
+	sleep( $s );
+    }
     return $rv;
 }
+
+=head2 autosleep()
+
+If given a parameter, it sets the numbers of seconds to sleep.
+Otherwise, it returns the number.
+
+    $y->autosleep( 5 );
+    sleep ( $y->autosleep() );
+
+May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
+
+This is used by C<get()>. If C<autosleep()> is set, then C<get()> will
+C<sleep()> for the specified period after every fetch.
+
+=cut
+
+sub autosleep
+{
+    my $w = shift;
+    if (@_) {
+	my ($sleep) = validate_pos( @_,
+	    { type => SCALAR, callbacks => {
+		    'is integer' => sub { shift() =~ /^ \d+ $/x },
+		    'not negative' => sub { shift() >= 0 },
+		} }, # number
+	);
+	$w->{__PACKAGE__.'-sleep'} = $sleep;
+    }
+    return $w->{__PACKAGE__.'-sleep'}||0;
+}
+
 
 # field()
 
@@ -342,6 +382,9 @@ sub list
 		    'defined and of length' => sub {
 			defined $_[0] and length $_[0]
 		    },
+		    'appropriate characters' => sub {
+			$_[0] =~ /^ [\w-]+ $/x;
+		    },
 		}}, # list
 	);
 	$w->{__PACKAGE__.'-list'} = $list;
@@ -391,6 +434,52 @@ sub lists
     } until ( not defined $next );
 
     return (sort keys %lists);
+}
+
+=head2 last_msg_id()
+
+Returns the highest message number with the archive.
+
+    my $last = $w->last_msg_id();
+    # Fetch last 10 messages:
+    for my $number ( ($last-10) .. $last )
+    {
+        push @messages, $w->fetch_message( $number );
+    }
+
+It will throw C<X::WWW::Yahoo::Groups::NoListSet> if no list has been
+specified with C<lists()>, C<X::WWW::Yahoo::Groups::UnexpectedPage> if
+the page fetched does not contain anything we thought it would, and
+C<X::WWW::Yahoo::Groups::BadFetch> if it is unable to fetch the page it
+needs.
+
+=cut
+
+
+sub last_msg_id
+{
+    my $w = shift;
+    validate_pos( @_ );
+    my $list = $w->list();
+    X::WWW::Yahoo::Groups::NoListSet->throw(
+	"Cannot determine archive extent without a list being specified.")
+	    unless defined $list and length $list;
+
+    $w->get( "http://groups.yahoo.com/group/$list/messages" );
+    my $content = $w->{res}->content;
+    my ($count) = $content =~ m!
+	<TITLE>
+	[^<]+?
+	\s+ of \s+
+	(\d+)
+	[^<]*?
+	<\/TITLE>
+    !six;
+    X::WWW::Yahoo::Groups::UnexpectedPage->throw(
+	"Unexpected title format. Perhaps group has no archive.")
+	    unless defined $count;
+
+    return $count;
 }
 
 =head2 fetch_message()
@@ -550,8 +639,9 @@ __END__
 
 Simon Hanmer for having problems with the module, thus resulting in
 improved error reporting, param validation and corrected prerequisites.
-Since then, Simon also provided a basis for the C<lists()> method and
-is causing me to think harder about my exceptions.
+Since then, Simon also provided a basis for the C<lists()> and
+C<last_msg_id()> methods and is causing me to think harder about my
+exceptions.
 
 Aaron Straup Cope for writing L<XML::Filter::YahooGroups> which
 uses this module for retrieving message bodies to put into RSS.

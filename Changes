@@ -1,6 +1,19 @@
 # Change log for WWW::Yahoo::Groups
 
 ---
+version: 1.7.5
+date:    10 Oct 2002
+changes:
+    - GPL renamed COPYING (to fit search.cpan.org)
+    - CREDITS file added (generated from POD)
+    - last_msg_id() added. Based on code from Simon Hanmer.
+    - Tests for last_msg_id() added.
+    - Brief note about being a well behaved bot added.
+    - list() ensures appropriate characters in list name.
+    - Automatically sleep() in get(), courtesy autosleep().
+    - Tests for sleep() added.
+
+---
 version: 1.7.4
 date:    10 Oct 2002
 changes:
@@ -73,7 +86,7 @@ changes:
 version: 1.4
 date:    02 Oct 2002
 changes:
-    - Module::Build is nicer than MM
+    - Module::Build is nicer than ExtUtils::MakeMaker
 
 ---
 version: 1.3

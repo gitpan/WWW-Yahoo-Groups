@@ -3,3 +3,4 @@ TODO:
   - Header restoration.
   - Logout method.
   - Login with different user/pass.
+  - Write UPGRADE file, dealing with incompatibilities, if any.

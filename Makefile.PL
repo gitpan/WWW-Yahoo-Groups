@@ -3,10 +3,9 @@ WriteMakefile(
     NAME		=> 'WWW::Yahoo::Groups',
     VERSION_FROM	=> 'lib/WWW/Yahoo/Groups.pm',
     PREREQ_PM => {
-		'WWW::Mechanize' => '0.51',
-		'Params::Validate' => '0.62',
-		'IO::Socket::SSL' => '0.94',
-		'Exception::Class' => '1.13',
+		'WWW::Mechanize' => '0.55',
+		'Params::Validate' => '0.64',
+		'Exception::Class' => '1.14',
 		'HTML::Entities' => '1.25',
 		'HTTP::Cookies' => '1.30',
 		'Test::More' => '0.47',

@@ -8,7 +8,11 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.8.3 (03 July 2003)
+Changes for 1.84 (24 July 2003)
+   - Page title handling smartened.
+   - Ad identification and progression smartened.
+   - Found cause of unknown test failures. Repaired.
+   - Use find_link rather than obsolete extract_links.
 
 For a complete list of changes, see the Changes file.
 

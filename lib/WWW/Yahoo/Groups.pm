@@ -91,7 +91,7 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.83';
+our $VERSION = '1.84';
 
 use Carp;
 use HTTP::Cookies;
@@ -442,19 +442,22 @@ sub lists
     my %lists;
 
     my $next = 'http://groups.yahoo.com/mygroups';
+    my $group_RE = qr# /group/ ([\w-]+?) \Q?yguid=\E #x;
     my $w = $self->agent;
     do {
 	$w->get( $next );
 	undef $next;
-	my $links = $w->extract_links();
-	# [0]: the contents of the href attribute
-	# [1]: the text enclosed by the <A> tag
-	# [2]: the contents of the name attribute
-	for my $link (@$links)
+
+	my @lists = map {
+	    $_->url =~ $group_RE; $1;
+	} $w->find_all_links(
+	    url_regex => $group_RE,
+	);
+	@lists{@lists} = 1;
+
+	if (my $url = $w->find_link( text => 'Next' ) )
 	{
-	    $next = $link->[0] if $link->[1] eq 'Next';
-	    next unless $link->[0] =~ m# /group/ ([\w-]+?) \Q?yguid=\E #x;
-	    $lists{$1} = 1;
+	    $next = $url->url;
 	}
     } until ( not defined $next );
 
@@ -489,7 +492,7 @@ sub get_extent
     my ($first, $last) = $w->res->content =~ m!
 	<TITLE>
 	[^<]+? : \s+
-	(\d+)-\d+ \s+ (?:of|/) \s+
+	(\d+)-\d+ \s+ (?:of|de|von|di|/) \s+
 	(\d+)
 	[^<]*?
 	</TITLE>
@@ -604,11 +607,12 @@ sub fetch_message
 	$res = $w->res;
     }
     my $content = $res->content;
-    if ($content =~ /\QYahoo! Groups is an advertising supported service.\E/gsm)
+    my $curi = $w->uri();
+    if ( $curi =~ m,/interrupt\?st,gsm )
     {
 	# If it's one of those damn interrupting ads, then click
 	# through.
-	$w->follow('Continue to message');
+	$w->follow_link( url_regex => qr{ /\Q$list\E/message/\d+ }x );
 	$res = $w->res;
 	$content = $res->content;
     }

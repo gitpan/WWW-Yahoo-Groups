@@ -6,6 +6,15 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.84
+date:    24 July 2003
+changes:
+    - Page title handling smartened.
+    - Ad identification and progression smartened.
+    - Found cause of unknown test failures. Repaired.
+    - Use find_link rather than obsolete extract_links.
+
+---
 version: 1.8.3
 date:    03 July 2003
 changes:

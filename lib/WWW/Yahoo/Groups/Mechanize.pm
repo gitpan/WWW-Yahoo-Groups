@@ -9,8 +9,6 @@ Params::Validate::validation_options(
     WWW::Yahoo::Groups::Errors->import()
 );
 
-use IO::Socket::SSL;
-
 sub new
 {
     my $class = shift;

@@ -31,7 +31,7 @@ The latest release version of WWW::Yahoo::Groups can be downloaded
 from any CPAN site:
 
     http://www.cpan.org/modules/by-authors/id/S/SP/SPOON/
-    http://search.cpan.org/~SPOON/WWW-Yahoo-Groups/
+    http://search.cpan.org/dist/WWW-Yahoo-Groups/
 
 Interim and development versions may also be available
 from the author's web site:
@@ -42,19 +42,19 @@ WWW::Yahoo::Groups is distributed as a gzipped tar archive file:
 
     WWW-Yahoo-Groups-<version>.tar.gz
 
-where <version> represents the current version number, e.g. 1.8.3.
+where <version> represents the current version number, e.g. 1.84.
 
 To install the module, unpack the distribution archive to
 create an installation directory.  Something like this:
 
-    tar zxf WWW-Yahoo-Groups-1.8.3.tar.gz
+    tar zxf WWW-Yahoo-Groups-1.84.tar.gz
 or
-    gunzip WWW-Yahoo-Groups-1.8.3.tar.gz
-    tar xf WWW-Yahoo-Groups-1.8.3.tar
+    gunzip WWW-Yahoo-Groups-1.84.tar.gz
+    tar xf WWW-Yahoo-Groups-1.84.tar
 
 You can then 'cd' into the directory created,
 
-    cd WWW-Yahoo-Groups-1.8.3
+    cd WWW-Yahoo-Groups-1.84
 
 
 INSTALLING MANUALLY
@@ -123,7 +123,7 @@ If you have a copy of cpantest installed, type:
     % cpantest -g pass -nc -p `basename \`pwd\`` -auto
 
 Or:
-    % cpantest -g pass -nc -p WWW-Yahoo-Groups-1.8.3 -auto
+    % cpantest -g pass -nc -p WWW-Yahoo-Groups-1.84 -auto
 
 That will tell both me and other potential users that the module
 built correctly on your machine.

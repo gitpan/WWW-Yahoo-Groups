@@ -1,6 +1,5 @@
 Artistic
 AUTHORS
-ChangeLog
 Changes
 COPYING
 CREDITS
@@ -28,4 +27,3 @@ t/08logout.t
 t/09badfetch.t
 t/10agent.t
 t/99pod.t
-TODO

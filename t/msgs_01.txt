@@ -5,9 +5,9 @@ X-Apparently-To: www_yaho_t@yahoogroups.com
 Received: (EGP: mail-8_1_1_4); 1 Oct 2002 11:30:28 -0000
 Received: (qmail 56362 invoked from network); 1 Oct 2002 11:30:28 -0000
 Received: from unknown (66.218.66.218)
-by m9.grp.scd.yahoo.com with QMQP; 1 Oct 2002 11:30:28 -0000
+ by m9.grp.scd.yahoo.com with QMQP; 1 Oct 2002 11:30:28 -0000
 Received: from unknown (HELO ouroboros.anu.edu.au) (150.203.232.210)
-by mta3.grp.scd.yahoo.com with SMTP; 1 Oct 2002 11:30:29 -0000
+ by mta3.grp.scd.yahoo.com with SMTP; 1 Oct 2002 11:30:29 -0000
 Received: (qmail 29678 invoked by uid 530); 1 Oct 2002 11:30:33 -0000
 Date: Tue, 1 Oct 2002 21:30:32 +1000
 To: www_yaho_t@yahoogroups.com
@@ -22,4 +22,3 @@ X-Yahoo-Group-Post: member; u=126010992
 X-Yahoo-Profile: perligain7ya5h00grrzogups
 
 Test 1.
-

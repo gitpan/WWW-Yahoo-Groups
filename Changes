@@ -3,6 +3,21 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.86
+date:    22 Aug 2003
+changes:
+    - Automatic address demunging.
+    - Yahoo now using RSS 2.
+    - Yahoo have redone their pages, thus new content parser.
+    - Headers now reformatted by default.
+    - Autosleep is on 5 by default rather than 0. Yahoo now throttle.
+    - Gone back to using our own agent rather than agent_alias.
+    - Trailing newlines (except one) stripped from messages.
+    - Header continuations identification improved.
+    - Use proxies if available.
+    - Automatic address demunging added.
+
+---
 version: 1.85
 date:    30 Jul 2003
 changes:

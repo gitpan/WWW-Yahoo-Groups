@@ -37,10 +37,10 @@ Try to be a well behaved bot and C<sleep()> for a few seconds (at least)
 after doing things. It's considered polite. There's a method
 C<autosleep()> that should be useful for this.
 
-It is recommended that you use this only if you're the moderator of a
-group, else you will get munged email addresses for everything. If
-there's sufficient demand for semi-automatic address demunging, I'll
-add it.
+If you're used to seeing munged email addresses when you view
+the message archive (i.e. you're not a moderator or owner of
+the group) then you'll be pleased to know that
+C<WWW::Yahoo::Groups> can demunge those email addresses.
 
 All exceptions are subclasses of C<X::WWW::Yahoo::Groups>, itself a
 subclass of C<Exception::Class>.
@@ -91,13 +91,14 @@ As these are recognised flaws, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.85';
+our $VERSION = '1.86';
 
 use Carp;
 use HTTP::Cookies;
 use HTML::Entities;
 use Params::Validate qw( :all );
 use WWW::Yahoo::Groups::Mechanize;
+use WWW::Yahoo::Groups::Utils;
 
 require WWW::Yahoo::Groups::Errors; 
 Params::Validate::validation_options(
@@ -631,19 +632,31 @@ sub fetch_message
     }
 
     # Strip content boundaries
-    $content =~ s/ ^ .*? \Q<!-- start content include -->\E //smx and
-    $content =~ s/ \Q<!-- end content include -->\E .* $ //smx and
+    $content =~ s/ ^ .*? \Q<!-- start content include -->\E //sx and
+    $content =~ s/ \Q<!-- end content include -->\E .* $ //sx and
 
     # Strip table wrappings
-    $content =~ s/ ^ .*? <table[^>]+> \s+ <tt> //smx and
-    $content =~ s! </tt> \s+ </table> .* $ !!smx and
+    $content =~ s/ ^ .*? <table[^>]+> .*? <tt> //sx and
+    $content =~ s! <br> \n <tt> !\n!xg and
+    $content =~ s! <br> \n </td></tr> \n </table> .* $ !\n!sx and
 
     # Munge content
-    $content =~ s!  <a \s+ href=" [^"]+ "> ([^<]+) </a> !$1!smgx and
-    $content =~ s/ <BR> //smgx or
-	X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	    "Message $number doesn't appear to be formatted as we like it.");
+    $content =~ s{ <a \s+ href=" ([^"]+) "> ([^<]+) </a> }{
+        $self->_check_protected($1,$2) }egx or
+    X::WWW::Yahoo::Groups::UnexpectedPage->throw(
+        "Message $number doesn't appear to be formatted as we like it.");
+
+    for ($content)
+    {
+        s! </tt> !!xg;
+        s/ ^ (--\w+--) <br> \n /$1\n\n/mgx;
+        s/ <BR>\n /\n/igx;
+        s/ <BR> //igx;
+        s/(\n)\n+$/$1/;
+        s{\Q<i>[\E(\QAttachment content not displayed.\E)\Q]</i>\E}{XXX $1 XXX\n}xg;
+    }
     decode_entities($content);
+    $content = $self->reformat_headers( $content );
 
     # Return
     return $content;
@@ -688,9 +701,9 @@ sub fetch_rss
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
 	"Thought we were getting RSS. Got something else.")
             unless $content =~ m[^
-		\Q<?xml version="1.0"?>\E
-		\s*
-		\Q<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"\E
+                \Q<?xml version="1.0" ?>\E \s*
+                \Q<rss version="2.0">\E    \s*
+                \Q<channel>\E
     ]sx;
     return $content;
 }
@@ -714,9 +727,88 @@ sub reformat_headers
 
     my ($header, $body) = split /\n\n/, $msg, 2;
 
-    $header =~ s/^ ([a-z-]+) (?!:) / $1/gmx;
+    $header =~ s/^ (?! (?:From\ |[a-z-]+:) ) / /igmx;
 
     return $header."\n\n".$body;
+}
+
+=head2 decode_protected
+
+Given a series of digits representing an email address
+as encoded by Yahoo Groups this method will return
+the decoded address.
+
+   my $decoded = $w->decode_protected( $protected );
+
+This will throw a C<X::WWW::Yahoo::Groups::BadProtected>
+if the input isn't understood and will also output some
+warnings to stderr.
+
+If you get such a problem then please L<report it/"BUGS">
+and include the warnings and error.
+
+=cut
+
+# Note that I expect $x should be reset at some point rather
+# than just be allowed to accumulate. I need to make some
+# longer encoded strings sometime.
+
+sub decode_protected
+{
+    my ($self, $code) = @_;
+    my $table = $self->get_unmangling_table;
+
+    my $failed = 0;
+    my $str = '';
+    my $x = 0;
+
+    while ( $code =~ /(...)/g )
+    {
+        my $char = $1;
+        my $t = $table->[$char][$x];
+        if ( defined $t and $t ne "" )
+        {
+            $str .= $t;
+        }
+        else
+        {
+            warn "Unknown unmangling entry: ($char, $x)\n";
+            $failed = 1;
+            $str .= "?";
+        }
+        $x++;
+    }
+
+    X::WWW::Yahoo::Groups::BadProtected->throw(
+        "Protected string `$code' contains unknown sequence (parsed to `$str')"
+    ) if $failed;
+
+    return $str;
+}
+
+=head1 PRIVATE METHODS
+
+=head2 _check_protected
+
+This checks whether a given URL is to a protected email or not.
+If so, returns the email address, else returns the second argment.
+
+    my $text = $self->_check_protected( $url, $text );
+
+=cut
+
+sub _check_protected
+{
+    my ( $self, $href, $text ) = @_;
+    my $list = $self->list;
+    if ( $href =~ m! ^ \Q/group/$list/post?protectID=\E (\d+) !x)
+    {
+        return $self->decode_protected($1);
+    }
+    else
+    {
+        return $text;
+    }
 }
 
 1;
@@ -738,6 +830,13 @@ Randal Schwartz (MERLYN) for pointing out some problems back in 1.4.
 Ray Cielencki (SLINKY) for C<first_msg_id> and "Age Restricted" notice
 bypassing.
 
+Vadim Zeitlin for F<yahoo2mbox> from which I blatantly stole
+some features.  (Well, I say I<stole> but F<yahoo2mbox> is
+public domain).
+
+Zainul M Charbiwala's address unmangling code was the first to
+be borrowed. (See L<WWW::Yahoo::Groups::Utils>.)
+
 =head1 BUGS
 
 Support for this module is provided courtesy the CPAN RT system via
@@ -749,7 +848,11 @@ the web or email:
 This makes it much easier for me to track things and thus means
 your problem is less likely to be neglected.
 
-=head1 LICENSE AND COPYRIGHT
+Please include the versions of C<WWW::Yahoo::Groups> and Perl
+that you are using and, if possible, the name of the group and
+the number of any messages you are having trouble with.
+
+=head1 LICENCE AND COPYRIGHT
 
 Copyright E<copy> Iain Truskett, 2002-2003. All rights reserved.
 
@@ -765,5 +868,7 @@ Iain Truskett <spoon@cpan.org>
 L<perl>, L<XML::Filter::YahooGroups>, L<http://groups.yahoo.com/>.
 
 L<WWW::Mechanize>, L<Exception::Class>.
+
+L<http://www.lpthe.jussieu.fr/~zeitlin/yahoo2mbox.html>
 
 =cut

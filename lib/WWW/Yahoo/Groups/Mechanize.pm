@@ -1,5 +1,5 @@
 package WWW::Yahoo::Groups::Mechanize;
-our $VERSION = '1.85';
+our $VERSION = '1.86';
 use base qw( WWW::Mechanize );
 use Params::Validate qw( validate_pos SCALAR );
 use strict;
@@ -15,7 +15,8 @@ sub new
     my $class = shift;
     my $self = $class->SUPER::new(@_);
     $self->cookie_jar({ });
-    $self->agent_alias("Windows IE 6");
+    $self->agent("Mozilla/5.0 (LWP; $class)");
+    $self->env_proxy();
     return $self;
 }
 
@@ -58,6 +59,7 @@ sub get
                 warn $form->dump;
             }
         }
+        warn "Clicking accept for adultconf\n" if $self->debug;
         $self->click( 'accept' );
     }
     if ($@) {
@@ -82,7 +84,7 @@ sub autosleep
 	);
 	$w->{__PACKAGE__.'-sleep'} = $sleep;
     }
-    return $w->{__PACKAGE__.'-sleep'}||0;
+    return $w->{__PACKAGE__.'-sleep'}||5;
 }
 
 1;

@@ -1,5 +1,5 @@
 package WWW::Yahoo::Groups::Errors;
-our $VERSION = '1.85';
+our $VERSION = '1.86';
 require Exception::Class;
 
     Exception::Class->import(
@@ -43,6 +43,10 @@ require Exception::Class;
 	    isa => 'X::WWW::Yahoo::Groups',
 	    description => 'We tried fetching a page, but failed',
 	},
+        'X::WWW::Yahoo::Groups::BadProtected' => {
+            isa => 'X::WWW::Yahoo::Groups',
+            description => 'Protected string contains unknown control sequence. Table needs amending.',
+        },
     );
 
 sub import

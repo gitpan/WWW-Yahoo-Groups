@@ -10,14 +10,8 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.85 (30 Jul 2003)
-   - Adult confirmation pass throughs fixed.
-   - Added preliminary header reformatter.
-   - We use agent_alias now instead of our own agent.
-   - Removed File::Slurp from example.
-   - Versioned sub-modules.
-   - Fix warning when URI was not defined.
-   - Refactored tests slightly.
+Changes for 1.86 (8 Aug 2003)
+   - Automatic address demunging.
 
 
 For a complete list of changes, see the Changes file.

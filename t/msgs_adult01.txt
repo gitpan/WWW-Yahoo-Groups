@@ -4,9 +4,9 @@ X-Sender: www-yahoo-groups@perl.dellah.org
 X-Apparently-To: craptestgroupforadulstuff@yahoogroups.com
 Received: (qmail 89239 invoked from network); 28 Jul 2003 05:44:03 -0000
 Received: from unknown (66.218.66.216)
-by m16.grp.scd.yahoo.com with QMQP; 28 Jul 2003 05:44:03 -0000
+ by m16.grp.scd.yahoo.com with QMQP; 28 Jul 2003 05:44:03 -0000
 Received: from unknown (HELO n1.grp.scd.yahoo.com) (66.218.66.64)
-by mta1.grp.scd.yahoo.com with SMTP; 28 Jul 2003 05:44:03 -0000
+ by mta1.grp.scd.yahoo.com with SMTP; 28 Jul 2003 05:44:03 -0000
 Received: from [66.218.66.115] by n1.grp.scd.yahoo.com with NNFMP; 28 Jul 2003 05:44:02 -0000
 Date: Mon, 28 Jul 2003 05:44:02 -0000
 To: craptestgroupforadulstuff@yahoogroups.com
@@ -68,5 +68,3 @@ stuff/message/242390?source=1&unwrap=1
 ok 9 - fetch 3 failed Message 242390 is not there.
 ok 10 - All done
 # Looks like you failed 4 tests of 10.
-
-

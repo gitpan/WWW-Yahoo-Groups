@@ -7,3 +7,5 @@ t/00load.t
 t/01login.t
 t/02badparam.t
 t/03message.t
+SIGNATURE
+examples/yahoo2maildir

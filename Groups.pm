@@ -31,16 +31,21 @@ add it.
 
 =item *
 
-Handle access restricted archives. It lets you login.
+Handles access restricted archives. It lets you login.
 
 =item *
 
-Handle the intermittent advertisements. It notes that it got one and
+Handles the intermittent advertisements. It notes that it got one and
 progresses straight to the message.
 
 =item *
 
-Handle attachments. We get the source which happens to be the raw stuff.
+Handles attachments. We get the source which happens to be the raw stuff.
+
+=item *
+
+Sanity checking. Could be improved, but it will generally barf if it
+doesn't understand something.
 
 =back
 
@@ -57,6 +62,8 @@ Handle errors.
 As these are recognised flaws, they are on the L</TODO> list.
 
 =cut
+
+our $VERSION = '1.30';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -303,19 +310,11 @@ sub fetch_message
 1;
 __END__
 
-=head1 TODO
+=head1 THANKS
 
-=over 4
-
-=item *
-
-Do some sanity checking on results from the fetches.
-
-=item *
-
-Tests. (Make dummy user for Yahoo Groups etc.)
-
-=back
+Simon Hanmer for having problems with the module, thus resulting
+in improved error reporting, param validation and corrected
+prerequisites.
 
 =head1 BUGS
 

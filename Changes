@@ -1,3 +1,9 @@
 Change log for WWW::Yahoo::Groups
 
+1.3 - Added SIGNATURE (Module::Signature)
+    - Added example program.
+    - Refined doco.
+
+1.2 - More tests, more exceptions, param validation.
+
 1.1 - initial (crappy) release.

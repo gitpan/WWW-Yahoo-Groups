@@ -3,7 +3,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'		=> 'WWW::Yahoo::Groups',
-    'VERSION'	=> '1.2', # finds $VERSION
+    'VERSION'	=> '1.3', # finds $VERSION
     'PREREQ_PM'		=> {
 	'WWW::Mechanize' => 0.31,
 	'HTTP::Cookies'  => 1.24,

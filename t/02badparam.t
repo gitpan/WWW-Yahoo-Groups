@@ -1,4 +1,4 @@
-use Test::More tests => 13;
+use Test::More tests => 14;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
@@ -29,6 +29,7 @@ my %subs = (
     fetch_message_undef => sub { $w->fetch_message( undef ) },
     list_blank => sub { $w->list( '' ) },
     list_toomany => sub { $w->list('fred', 'bob') },
+    fetch_rss_toomany => sub { $w->fetch_rss('moo') },
 );
 
 # Test that they all fail

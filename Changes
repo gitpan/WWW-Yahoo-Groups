@@ -1,5 +1,8 @@
 Change log for WWW::Yahoo::Groups
 
+1.6 - Aaron Straup Cope wrote a module to play with Yahoo RSS.
+    - So I added a bit to get the RSS in an abstract fashion.
+
 1.5 - But it helps to not mess up the MB scripts. Ta Merlyn.
 
 1.4 - Module::Build is nicer than MM

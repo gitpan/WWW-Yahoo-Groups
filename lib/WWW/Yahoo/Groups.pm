@@ -63,7 +63,7 @@ As these are recognised flaws, they are on the L</TODO> list.
 
 =cut
 
-our $VERSION = '1.30';
+our $VERSION = '1.60';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -89,6 +89,10 @@ use Exception::Class (
     'X::WWW::Yahoo::Groups::UnexpectedPage' => {
 	isa => 'X::WWW::Yahoo::Groups',
 	description => 'We received a page that I do not understand',
+    },
+    'X::WWW::Yahoo::Groups::BadFetch' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'We tried fetching a page, but failed',
     },
 );
 
@@ -154,8 +158,13 @@ Generally, you won't need to use this method.
 sub get
 {
     my $self = shift;
-    warn "Fetching $_[0]\n" if $self->debug;
-    return $self->SUPER::get(@_);
+    my $url = $_[0];
+    warn "Fetching $url\n" if $self->debug;
+    my $rv = $self->SUPER::get(@_);
+    X::WWW::Yahoo::Groups::BadFetch->throw(
+	"Unable to fetch $url: ".$self->{res}->message)
+	    if ($self->{res}->is_error);
+    return $rv;
 }
 
 # field()
@@ -307,6 +316,36 @@ sub fetch_message
     return $content;
 }
 
+=head2 fetch_rss()
+
+Returns the RSS for the gruop's most recent messages. See
+L<XML::Filter::YahooGroups> for ways to process this RSS into
+containing the message bodies.
+
+    my $rss = $w->fetch_rss();
+
+=cut
+
+sub fetch_rss
+{
+    my $w = shift;
+    validate_pos( @_ );
+    my $list = $w->list();
+    X::WWW::Yahoo::Groups::NoListSet->throw(
+	"Cannot fetch a list's RSS without a list being specified.")
+	    unless defined $list and length $list;
+    $w->get( "http://groups.yahoo.com/group/$list/messages?rss=1" );
+    my $content = $w->{res}->content;
+    X::WWW::Yahoo::Groups::UnexpectedPage->throw(
+	"Thought we were getting RSS. Got something else.")
+            unless $content =~ m[^
+		\Q<?xml version="1.0"?>\E
+		\s*
+		\Q<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"\E
+    ]sx;
+    return $w->{res}->content;
+}
+
 1;
 __END__
 
@@ -315,6 +354,11 @@ __END__
 Simon Hanmer for having problems with the module, thus resulting
 in improved error reporting, param validation and corrected
 prerequisites.
+
+Aaron Straup Cope for writing L<XML::Filter::YahooGroups> which
+uses this module for retrieving message bodies to put into RSS.
+
+Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
 
 =head1 BUGS
 
@@ -327,6 +371,6 @@ Iain Truskett <spoon@cpan.org>
 
 =head1 SEE ALSO
 
-L<perl>, L<WWW::Mechanize>
+L<perl>, L<WWW::Mechanize>, L<XML::Filter::YahooGroups>
 
 =cut

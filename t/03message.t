@@ -26,7 +26,7 @@ is($list => 'www_yaho_t' => 'List set correctly.');
     {
 	$w->fetch_message( 1 )
     };
-    if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups::BadParam')) {
+    if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
 	fail("fetch 1 failed ".$@->error);
     } elsif ($@) {
 	fail("fetch 1 failed, for some reason.");

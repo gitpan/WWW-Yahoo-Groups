@@ -1,4 +1,5 @@
 package WWW::Yahoo::Groups::Errors;
+our $VERSION = '1.85';
 require Exception::Class;
 
     Exception::Class->import(

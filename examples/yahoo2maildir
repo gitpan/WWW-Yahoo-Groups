@@ -2,7 +2,6 @@
 use strict;
 use 5.006;
 use WWW::Yahoo::Groups;
-use File::Slurp;
 
 =head1 NAME
 
@@ -67,3 +66,9 @@ This script is public domain. Do what you will.
 
 =cut
 
+sub write_file
+{
+    my ($file, $data) = @_;
+    open my $fh, '>', $file or die "Cannot write to $file: $!\n";
+    print $fh $data;
+}

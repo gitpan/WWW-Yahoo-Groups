@@ -1,8 +1,8 @@
 Artistic
 AUTHORS
+ChangeLog
 Changes
 COPYING
-CREDITS
 examples/yahoo2maildir
 INSTALL
 lib/WWW/Yahoo/Groups.pm
@@ -14,10 +14,10 @@ MANIFEST
 MANIFEST.SKIP
 META.yml
 README
-SIGNATURE
 t/00load.t
 t/01login.t
 t/02badparam.t
+t/03adult.t
 t/03message.t
 t/04rss.t
 t/05lists.t
@@ -26,4 +26,9 @@ t/07sleep.t
 t/08logout.t
 t/09badfetch.t
 t/10agent.t
+t/11reform.t
 t/99pod.t
+t/msgs_01.txt
+t/msgs_01re.txt
+t/msgs_02.txt
+t/msgs_adult01.txt

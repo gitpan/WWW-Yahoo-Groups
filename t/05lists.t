@@ -20,7 +20,7 @@ BEGIN { use_ok 'WWW::Yahoo::Groups' }
 }
 
 # Our special user, as usual
-test_lists( 'perligain7ya5h00grrzogups' => 'redblacktrees' => 2);
+test_lists( 'perligain7ya5h00grrzogups' => 'redblacktrees' => 3 );
 
 sub test_lists
 {

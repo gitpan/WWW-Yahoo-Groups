@@ -1,8 +1,9 @@
 package WWW::Yahoo::Groups::Mechanize;
-use vars qw( @ISA );
-@ISA = qw( WWW::Mechanize );
-use WWW::Mechanize;
+our $VERSION = '1.85';
+use base qw( WWW::Mechanize );
 use Params::Validate qw( validate_pos SCALAR );
+use strict;
+use warnings FATAL => 'all';
 
 require WWW::Yahoo::Groups::Errors; 
 Params::Validate::validation_options(
@@ -14,7 +15,7 @@ sub new
     my $class = shift;
     my $self = $class->SUPER::new(@_);
     $self->cookie_jar({ });
-    $self->agent("Mozilla/5.0 (LWP; $class)");
+    $self->agent_alias("Windows IE 6");
     return $self;
 }
 
@@ -47,6 +48,18 @@ sub get
 	# Return something
 	0;
     };
+    if ( $self->uri and $self->uri =~ m,/adultconf\?, )
+    {
+        my $form = $self->form_number( 0 );
+        if ($self->debug)
+        {
+            for my $form ( $self->forms )
+            {
+                warn $form->dump;
+            }
+        }
+        $self->click( 'accept' );
+    }
     if ($@) {
 	die $@ unless ref $@;
 	$@->rethrow if $@->fatal;

@@ -1,6 +1,6 @@
 package WWW::Yahoo::Groups;
 use strict;
-use warnings;
+use warnings FATAL => 'all';
 
 =head1 NAME
 
@@ -87,11 +87,11 @@ being a moderator on the lists in question.
 
 =back
 
-As this is a recognised flaw, they are on the F<TODO> list.
+As these are recognised flaws, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.84';
+our $VERSION = '1.85';
 
 use Carp;
 use HTTP::Cookies;
@@ -607,8 +607,7 @@ sub fetch_message
 	$res = $w->res;
     }
     my $content = $res->content;
-    my $curi = $w->uri();
-    if ( $curi =~ m,/interrupt\?st,gsm )
+    if ( $w->uri =~ m,/interrupt\?st,gsm )
     {
 	# If it's one of those damn interrupting ads, then click
 	# through.
@@ -694,6 +693,30 @@ sub fetch_rss
 		\Q<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"\E
     ]sx;
     return $content;
+}
+
+=head2 reformat_headers
+
+This does some simple reformatting of headers. Yahoo!Groups seems to
+manage to mangle multiline headers. This is particularly noticable with
+the C<Received> header.
+
+The rule is that any line that starts with a series of lowercase
+letters or hyphens that is B<NOT> immediately followed by a colon
+is regarded as being part of the previous line and is indented with
+a space character (as per RFC2822).
+
+=cut
+
+sub reformat_headers
+{
+    my ($self, $msg) = @_;
+
+    my ($header, $body) = split /\n\n/, $msg, 2;
+
+    $header =~ s/^ ([a-z-]+) (?!:) / $1/gmx;
+
+    return $header."\n\n".$body;
 }
 
 1;

@@ -4,7 +4,7 @@ use warnings FATAL => 'all';
 
 =head1 NAME
 
-WWW::Yahoo::Groups - automated access to Yahoo! Groups.
+WWW::Yahoo::Groups - Automated access to Yahoo! Groups archives.
 
 =head1 SYNOPSIS
 
@@ -20,31 +20,11 @@ WWW::Yahoo::Groups - automated access to Yahoo! Groups.
         warn "Problem: ".$@->error;
     }
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 C<WWW::Yahoo::Groups> retrieves messages from the archive of Yahoo
 Groups. It provides a simple OO interface to logging in and retrieving
 said messages which you may then do with as you will.
-
-=head1 DESCRIPTION
-
-C<WWW::Yahoo::Groups> is a subclass of C<WWW::Mechanize>, overriding a
-few methods and supplying a few extra. As such, any method available in
-C<WWW::Mechanize> is available to C<WWW::Yahoo::Groups>, perhaps
-augmented with extra features.
-
-Try to be a well behaved bot and C<sleep()> for a few seconds (at least)
-after doing things. It's considered polite. There's a method
-C<autosleep()> that should be useful for this. Recently, this has been
-set to a default of 1 second. Feel free to tweak if necessary.
-
-If you're used to seeing munged email addresses when you view
-the message archive (i.e. you're not a moderator or owner of
-the group) then you'll be pleased to know that
-C<WWW::Yahoo::Groups> can demunge those email addresses.
-
-All exceptions are subclasses of C<X::WWW::Yahoo::Groups>, itself a
-subclass of C<Exception::Class>.
 
 =head2 Things it does
 
@@ -81,16 +61,60 @@ being a moderator on the lists in question.
 
 =back
 
+=head1 USAGE
+
+Try to be a well behaved bot and C<sleep()> for a few seconds (at least)
+after doing things. It's considered polite. There's an
+L<autosleep|/"autosleep"> method that should be useful for this.
+Recently, this has been set to a default of 1 second. Feel free to tweak
+if necessary.
+
+If you're used to seeing munged email addresses when you view
+the message archive (i.e. you're not a moderator or owner of
+the group) then you'll be pleased to know that
+C<WWW::Yahoo::Groups> can demunge those email addresses.
+
+All exceptions are subclasses of C<X::WWW::Yahoo::Groups>, itself a
+subclass of C<Exception::Class>. See L<WWW::Yahoo::Groups::Errors> for
+details.
+
+=head1 OTHER DOCUMENTATION
+
+=head2 I<Spidering Hacks>, by Kevin Hemenway and Tara Calishain
+
+I<Spidering Hacks> from O'Reilly
+(L<http://www.oreilly.com/catalog/spiderhks/>) is a great book for anyone
+wanting to know more about screen-scraping and spidering.
+
+There is a WWW::Yahoo::Groups based hack by Andy Lester:
+
+=over 4
+
+=item 44 Archiving Yahoo! Groups Messages with WWW::Yahoo::Groups
+
+=item 
+
+=back
+
+and two hacks, not related to this module, by me, Iain Truskett:
+
+=over 4
+
+=item 19 Scraping with HTML::TreeBuilder
+
+=item 57 Related Amazon.com Products with Alexa
+
+=back
+
 =cut
 
-our $VERSION = '1.89';
+our $VERSION = '1.91';
 
 use Carp;
 use HTTP::Cookies;
 use HTML::Entities;
 use Params::Validate qw( :all );
 use WWW::Yahoo::Groups::Mechanize;
-use WWW::Yahoo::Groups::Utils;
 
 require WWW::Yahoo::Groups::Errors; 
 Params::Validate::validation_options(
@@ -99,43 +123,50 @@ Params::Validate::validation_options(
 
 =head1 METHODS
 
-=head2 new()
+=head2 Constructor
+
+=head3 new
 
 Create a new C<WWW::Yahoo::Groups> robot.
 
     my $y = WWW::Yahoo::Groups->new();
+
+It can take a has of named arguments. Two arguments are defined:
+C<debug> and C<autosleep>. They correspond to the methods of the same
+name.
+
+    my $y = WWW::Yahoo::Groups->new(
+        debug => 1,
+        autosleep => 4,
+    );
 
 =cut
 
 sub new
 {
     my $class = shift;
+    my %args = ( debug => 0, autosleep => 1, @_ );
     my $self = bless {}, $class;
     my $w = WWW::Yahoo::Groups::Mechanize->new();
     $self->agent($w);
-    $self->debug(0);
+    $self->debug( $args{debug} );
+    $self->autosleep( $args{ autosleep } );
     return bless $self, $class;
 }
 
-=head2 agent()
+=head2 Options
 
-Returns or sets the C<WWW::Mechanize> based agent. Not for general use.
-
-=cut
-
-sub agent
-{
-    my $self = shift;
-    @_ ? ( $self->{agent} = $_[0], $self ) : $self->{agent};
-}
-
-=head2 debug()
+=head3 debug
 
 Enable/disable/read debugging mode.
 
     $y->debug(0); # Disable
     $y->debug(1); # Enable
     warn "Debugging!" if $y->debug();
+
+The C<debug> method of the current L<agent|/agent> object will
+be invoked with the truth of the argument. This usually means
+L<WWW::Yahoo::Groups::Mechanize/debug>.
 
 =cut
 
@@ -150,50 +181,29 @@ sub debug
     $self->{__PACKAGE__.'-debug'};
 }
 
-=head2 get()
-
-Fetch a given URL.
-
-If C<debug()> is enabled, then it will displaying a warning showing the
-URL. If C<autosleep()> has been given an interval, then C<get()> will
-sleep for that interval after successfully fetching a page.
-
-    $y->get( 'http://groups.yahoo.com' );
-
-Generally, you won't need to use this method. It's used by a number of
-the other methods and will throw a C<X::WWW::Yahoo::Groups::BadFetch> if
-it is unable to retrieve the specified page.
-
-Returns 0 if success, else an exception object.
-
-    my $rv = $y->get( 'http://groups.yahoo.com' );
-    $rv->rethrow if $rv;
-
-    # or, more idiomatically
-    my $rv = $y->get( 'http://groups.yahoo.com' ) and $rv->rethrow;
-
-=cut
-
-sub get { my $self = shift; $self->agent->get(@_) }
-
-=head2 autosleep()
+=head3 autosleep
 
 If given a parameter, it sets the numbers of seconds to sleep.
-Otherwise, it returns the number. Defaults to 1 seconds.
+Otherwise, it returns the number. Defaults to 1 second.
 
     $y->autosleep( 5 ); # Set it to 5.
     sleep ( $y->autosleep() );
 
 May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
 
-This is used by C<get()>. If C<autosleep()> is set, then C<get()> will
+This is used by L<get|/get>. If C<autosleep> is set, then C<get> will
 C<sleep()> for the specified period after every fetch.
+
+Implemented by the object returned by L<agent|/agent>. By default this
+means L<WWW::Yahoo::Groups::Mechanize/autosleep>.
 
 =cut
 
 sub autosleep { my $self = shift; $self->agent->autosleep(@_) }
 
-=head2 login()
+=head2 Logging in and out
+
+=head3 login
 
 Logs the robot into the Yahoo! Groups system.
 
@@ -220,8 +230,9 @@ C<X::WWW::Yahoo::Groups::BadLogin> if unable to log in for some reason
 =item *
 
 C<X::WWW::Yahoo::Groups::AlreadyLoggedIn> if the object is already
-logged in. I intend to make this exception redundant, and add a
-C<logout()> method.
+logged in. I intend to make this exception redundant, perhaps by
+just making C<login> a null-op is we're already logged in, or by calling
+L<logout|/logout> and then relogging in.
 
 =back
 
@@ -285,7 +296,7 @@ sub login
     return $rv;
 }
 
-=head2 logout()
+=head3 logout
 
 Logs the robot out of the Yahoo! Groups system.
 
@@ -350,10 +361,10 @@ sub logout
     return $rv;
 }
 
-=head2 loggedin()
+=head3 loggedin
 
 Returns 1 if you are logged in, else 0. Note that this merely tests if
-you've used the C<login()> method successfully, not whether the Yahoo!
+you've used the L<login|/login> method successfully, not whether the Yahoo!
 site has expired your session.
 
    print "Logged in!\n" if $w->loggedin();
@@ -372,7 +383,9 @@ sub loggedin
     return 0;
 }
 
-=head2 list()
+=head2 Setting target list and finding possible lists
+
+=head3 list
 
 If given a parameter, it sets the list to use. Otherwise, it returns
 the current list, or C<undef> if no list is set.
@@ -385,7 +398,7 @@ cases it. If not, you may experience odd behaviour.
 
 May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
 
-See also C<lists()> for how to get a list of possible lists.
+See also L<lists|/lists> for how to get a list of possible lists.
 
 =cut
 
@@ -409,7 +422,7 @@ sub list
     return $self->{__PACKAGE__.'-list'};
 }
 
-=head2 lists()
+=head3 lists
 
 If you'd like a list of the groups to which you are subscribed,
 then use this method.
@@ -457,14 +470,16 @@ sub lists
     return (sort keys %lists);
 }
 
-=head2 first_msg_id()
+=head2 List information
+
+=head3 first_msg_id
 
 Returns the lowest message number with the archive.
 
     my $first = $w->first_msg_id();
 
 It will throw C<X::WWW::Yahoo::Groups::NoListSet> if no list has been
-specified with C<lists()>, C<X::WWW::Yahoo::Groups::UnexpectedPage> if
+specified with L<lists|/lists>, C<X::WWW::Yahoo::Groups::UnexpectedPage> if
 the page fetched does not contain anything we thought it would, and
 C<X::WWW::Yahoo::Groups::BadFetch> if it is unable to fetch the page it
 needs.
@@ -507,7 +522,7 @@ sub first_msg_id
     return $self->{first};
 }
 
-=head2 last_msg_id()
+=head3 last_msg_id
 
 Returns the highest message number with the archive.
 
@@ -519,7 +534,7 @@ Returns the highest message number with the archive.
     }
 
 It will throw C<X::WWW::Yahoo::Groups::NoListSet> if no list has been
-specified with C<lists()>, C<X::WWW::Yahoo::Groups::UnexpectedPage> if
+specified with L<lists|/lists>, C<X::WWW::Yahoo::Groups::UnexpectedPage> if
 the page fetched does not contain anything we thought it would, and
 C<X::WWW::Yahoo::Groups::BadFetch> if it is unable to fetch the page it
 needs.
@@ -534,7 +549,9 @@ sub last_msg_id
     return $self->{last};
 }
 
-=head2 fetch_message()
+=head2 Fetching an actual message
+
+=head3 fetch_message
 
 Fetches a specified message from the list's archives. Returns it as
 a mail message (with headers) suitable for saving into a Maildir.
@@ -570,7 +587,6 @@ archive (any of deleted, never archived or you're beyond the range of
 the group).
 
 =back
-
 
 =cut
 
@@ -653,7 +669,41 @@ sub fetch_message
     return $content;
 }
 
-=head2 fetch_rss()
+=head3 reformat_headers
+
+This does some simple reformatting of headers. Yahoo!Groups seems to
+manage to mangle multiline headers. This is particularly noticable with
+the C<Received> header.
+
+The rule is that any line that starts with a series of lowercase
+letters or hyphens that is B<NOT> immediately followed by a colon
+is regarded as being part of the previous line and is indented with
+a space character (as per RFC2822).
+
+Input to this method should be a whole message. Output is that same
+message, with the headers repaired.
+
+This method is called by L<fetch_message|/fetch_message> but this was
+not always the case. If you have archives that predate this implicit
+call, you may want to run messages through this routine.
+
+=cut
+
+sub reformat_headers
+{
+    my ($self, $msg) = @_;
+
+    my ($header, $body) = split /\n\n/, $msg, 2;
+
+    $header =~ s/^ (?! (?:From\ |[a-z-]+:) ) / /igmx;
+    $body = '' unless defined $body;
+
+    return $header."\n\n".$body;
+}
+
+=head2 Other methods
+
+=head3 fetch_rss
 
 Returns the RSS for the group's most recent messages. See
 L<XML::Filter::YahooGroups> for ways to process this RSS into
@@ -699,90 +749,48 @@ sub fetch_rss
     return $content;
 }
 
-=head2 reformat_headers
+=head1 PRIVATE METHODS
 
-This does some simple reformatting of headers. Yahoo!Groups seems to
-manage to mangle multiline headers. This is particularly noticable with
-the C<Received> header.
+=head2 agent
 
-The rule is that any line that starts with a series of lowercase
-letters or hyphens that is B<NOT> immediately followed by a colon
-is regarded as being part of the previous line and is indented with
-a space character (as per RFC2822).
+Returns or sets the C<WWW::Mechanize> based agent. Not for general use.
+If you must fiddle with it, your object's API must match that of
+L<WWW::Yahoo::Groups::Mechanize> and L<WWW::Mechanize>.
 
 =cut
 
-sub reformat_headers
+sub agent
 {
-    my ($self, $msg) = @_;
-
-    my ($header, $body) = split /\n\n/, $msg, 2;
-
-    $header =~ s/^ (?! (?:From\ |[a-z-]+:) ) / /igmx;
-
-    return $header."\n\n".$body;
+    my $self = shift;
+    @_ ? ( $self->{agent} = $_[0], $self ) : $self->{agent};
 }
+
+=head2 get
+
+Fetch a given URL. Delegated to L<WWW::Yahoo::Groups::Mechanize/"get">
+(well, the C<get> method of the object returned by L<agent|/agent>).
+
+=cut
+
+sub get { my $self = shift; $self->agent->get(@_) }
 
 =head2 decode_protected
 
-Given a series of digits representing an email address
-as encoded by Yahoo Groups this method will return
-the decoded address.
-
-   my $decoded = $w->decode_protected( $protected );
-
-This will throw a C<X::WWW::Yahoo::Groups::BadProtected>
-if the input isn't understood and will also output some
-warnings to stderr.
-
-If you get such a problem then please L<report it/"BUGS">
-and include the warnings and error.
+This method does nothing as Yahoo changed their algorithm.
 
 =cut
-
-# Note that I expect $x should be reset at some point rather
-# than just be allowed to accumulate. I need to make some
-# longer encoded strings sometime.
 
 sub decode_protected
 {
     my ($self, $code) = @_;
-    my $table = $self->get_unmangling_table;
-
-    my $failed = 0;
-    my $str = '';
-    my $x = 0;
-
-    while ( $code =~ /(...)/g )
-    {
-        my $char = $1;
-        my $t = $table->[$char][$x];
-        if ( defined $t and $t ne "" )
-        {
-            $str .= $t;
-        }
-        else
-        {
-            warn "Unknown unmangling entry: ($char, $x)\n";
-            $failed = 1;
-            $str .= "?";
-        }
-        $x++;
-    }
-
-    X::WWW::Yahoo::Groups::BadProtected->throw(
-        "Protected string `$code' contains unknown sequence (parsed to `$str')"
-    ) if $failed;
-
-    return $str;
+    return;
 }
-
-=head1 PRIVATE METHODS
 
 =head2 _check_protected
 
-This checks whether a given URL is to a protected email or not.
-If so, returns the email address, else returns the second argment.
+This checks whether a given URL is to a protected email or not. It
+returns C<$text> regardless as I do not have a decoding algorithm for
+Yahoo's updated encoding scheme.
 
     my $text = $self->_check_protected( $url, $text );
 
@@ -791,15 +799,7 @@ If so, returns the email address, else returns the second argment.
 sub _check_protected
 {
     my ( $self, $href, $text ) = @_;
-    my $list = $self->list;
-    if ( $href =~ m! ^ \Q/group/$list/post?protectID=\E (\d+) !x)
-    {
-        return $self->decode_protected($1);
-    }
-    else
-    {
-        return $text;
-    }
+    return $text;
 }
 
 1;
@@ -809,8 +809,8 @@ __END__
 
 Simon Hanmer for having problems with the module, thus resulting in
 improved error reporting, param validation and corrected prerequisites.
-Since then, Simon also provided a basis for the C<lists()> and
-C<last_msg_id()> methods and is causing me to think harder about my
+Since then, Simon also provided a basis for the L<lists|/lists> and
+L<last_msg_id|/last_msg_id> methods and is causing me to think harder about my
 exceptions.
 
 Aaron Straup Cope (ASCOPE) for writing L<XML::Filter::YahooGroups>
@@ -826,8 +826,10 @@ Vadim Zeitlin for F<yahoo2mbox> from which I blatantly stole
 some features.  (Well, I say I<stole> but F<yahoo2mbox> is
 public domain).
 
-Zainul M Charbiwala's address unmangling code was the first to
-be borrowed. (See L<WWW::Yahoo::Groups::Utils>.)
+Andy Lester (PETDANCE) for writing about this module in I<Spidering Hacks>.
+
+iTerrence Brannon (TBONE) for reporting the example program
+and empty body bugs.
 
 =head1 BUGS
 

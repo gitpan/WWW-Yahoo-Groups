@@ -15,7 +15,7 @@ $w->login( 'perligain7ya5h00grrzogups' => 'redblacktrees' );
 
 # Our special list
 my $list = eval {
-    $w->list( 'craptestgroupforadulstuff' );
+    $w->list( 'craptestgroupforadulstufg' );
     return $w->list();
 };
 if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
@@ -25,7 +25,7 @@ if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
 } else {
     pass("Did not fail setting list.");
 }
-is($list => 'craptestgroupforadulstuff' => 'List set correctly.');
+is($list => 'craptestgroupforadulstufg' => 'List set correctly.');
 
 # Fetch message 1 - a message with no attachment
 {

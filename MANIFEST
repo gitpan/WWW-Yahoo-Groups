@@ -9,7 +9,6 @@ INSTALL
 lib/WWW/Yahoo/Groups.pm
 lib/WWW/Yahoo/Groups/Errors.pm
 lib/WWW/Yahoo/Groups/Mechanize.pm
-lib/WWW/Yahoo/Groups/Utils.pm
 LICENCE
 Makefile.PL
 MANIFEST
@@ -18,6 +17,7 @@ META.yml
 README
 SIGNATURE
 t/00load.t
+t/00sig.t
 t/01login.t
 t/02badparam.t
 t/03adult.t
@@ -29,9 +29,7 @@ t/07sleep.t
 t/08logout.t
 t/09badfetch.t
 t/10agent.t
-t/12decode.t
 t/99pod.t
 t/msgs_01.txt
 t/msgs_02.txt
-t/msgs_12.txt
 t/msgs_adult01.txt

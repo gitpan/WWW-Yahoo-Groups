@@ -46,7 +46,7 @@ for my $number ( $min .. $max )
     my $content = eval { $w->fetch_message( $number ) };
     if ( $@ and $@->isa('X::WWW::Yahoo::Groups') ) {
 	# If it's one of our errors just continue
-        warn "Could not handle message $num: ", $@->error, "\n";
+        warn "Could not handle message $number: ", $@->error, "\n";
     } elsif ($@) {
 	# Otherwise, abort.
 	die;

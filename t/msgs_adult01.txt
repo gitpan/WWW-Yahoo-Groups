@@ -1,70 +1,31 @@
-From www-yahoo-groups@perl.dellah.org Sun Jul 27 22:44:03 2003
+From www-yahoo-groups@perl.dellah.org Mon Dec 01 02:25:00 2003
 Return-Path: <www-yahoo-groups@perl.dellah.org>
 X-Sender: www-yahoo-groups@perl.dellah.org
-X-Apparently-To: craptestgroupforadulstuff@yahoogroups.com
-Received: (qmail 89239 invoked from network); 28 Jul 2003 05:44:03 -0000
+X-Apparently-To: craptestgroupforadulstufg@yahoogroups.com
+Received: (qmail 594 invoked from network); 1 Dec 2003 10:25:00 -0000
 Received: from unknown (66.218.66.216)
- by m16.grp.scd.yahoo.com with QMQP; 28 Jul 2003 05:44:03 -0000
-Received: from unknown (HELO n1.grp.scd.yahoo.com) (66.218.66.64)
- by mta1.grp.scd.yahoo.com with SMTP; 28 Jul 2003 05:44:03 -0000
-Received: from [66.218.66.115] by n1.grp.scd.yahoo.com with NNFMP; 28 Jul 2003 05:44:02 -0000
-Date: Mon, 28 Jul 2003 05:44:02 -0000
-To: craptestgroupforadulstuff@yahoogroups.com
-Subject: fnerk
-Message-ID: <bg2d72+aour@eGroups.com>
+ by m3.grp.scd.yahoo.com with QMQP; 1 Dec 2003 10:25:00 -0000
+Received: from unknown (HELO n37.grp.scd.yahoo.com) (66.218.66.105)
+ by mta1.grp.scd.yahoo.com with SMTP; 1 Dec 2003 10:25:00 -0000
+Received: from [66.218.66.122] by n37.grp.scd.yahoo.com with NNFMP; 01 Dec 2003 10:24:59 -0000
+Date: Mon, 01 Dec 2003 10:24:58 -0000
+To: craptestgroupforadulstufg@yahoogroups.com
+Subject: bnerk
+Message-ID: <bqf4tq+22at@eGroups.com>
 User-Agent: eGroups-EW/0.82
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Length: 1583
+Content-Length: 39
 X-Mailer: Yahoo Groups Message Poster
+X-eGroups-Remote-IP: 66.218.66.105
 From: "perligain7ya5h00grrzogups" <www-yahoo-groups@perl.dellah.org>
-X-Originating-IP: 203.38.71.25
+X-Originating-IP: 203.38.71.43
 X-Yahoo-Group-Post: member; u=126010992
 X-Yahoo-Profile: perligain7ya5h00grrzogups
 
-Skip blib/lib/WWW/Yahoo/Groups.pm (unchanged)
-Skip blib/lib/WWW/Yahoo/Groups/Errors.pm (unchanged)
-cp lib/WWW/Yahoo/Groups/Mechanize.pm
-blib/lib/WWW/Yahoo/Groups/Mechanize.pm
-1..10
-ok 1 - use WWW::Yahoo::Groups;
-ok 2 - The object isa WWW::Yahoo::Groups
-Fetching http://groups.yahoo.com/
-Fetching
-http://login.yahoo.com/config/login?.intl=us&.src=
-ygrp&.done=http://groups.yahoo.com%2F
-ok 3 - Did not fail setting list.
-ok 4 - List set correctly.
-Fetching
-http://groups.yahoo.com/group/craptestgroupforadul
-stuff/message/1?source=1&unwrap=1
-POST http://groups.yahoo.com/adultconf
-ref= (hidden)
-
-dest=/group/craptestgroupforadulstuff/auth?done=%2
-Fgroup%2Fcraptestgroupforadulstuff%2Fmessage%2F1%3
-Fsource%3D1%26unwrap%3D1
-(hidden)
-accept=I Accept (submit)
-reject=I Don't Accept (submit)
-not ok 5 - fetch 1 failed Message 1 is not there.
-# Failed test (t/03adult.t at line 33)
-not ok 6 - Retrieved message 1 correctly
-# Failed test (t/03adult.t at line 44)
-# got: undef
-# expected: ''
-Fetching
-http://groups.yahoo.com/group/craptestgroupforadul
-stuff/message/2?source=1&unwrap=1
-not ok 7 - fetch 2 failed Message 2 is not there.
-# Failed test (t/03adult.t at line 54)
-not ok 8 - Retrieved message 2 correctly
-# Failed test (t/03adult.t at line 65)
-# got: undef
-# expected: ''
-Fetching
-http://groups.yahoo.com/group/craptestgroupforadul
-stuff/message/242390?source=1&unwrap=1
-ok 9 - fetch 3 failed Message 242390 is not there.
-ok 10 - All done
-# Looks like you failed 4 tests of 10.
+mdkslfa
+mklsa
+mkls
+mlw
+grwmg
+erwgmerkl

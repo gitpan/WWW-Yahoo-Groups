@@ -1,5 +1,5 @@
 package WWW::Yahoo::Groups::Errors;
-our $VERSION = '1.89';
+our $VERSION = '1.91';
 
 =head1 NAME
 

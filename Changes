@@ -3,6 +3,22 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.91
+date:    1 Dec 2003
+changes:
+
+    - Demangling removed due to Yahoo changing algorithm.
+    - Requires newer Mech and LWP.
+    - Bug with empty messages fixed.
+    - Bad variable in example program fixed.
+
+    - Spidering Hacks mentioned.
+
+    - Documentation updated with some nits fixed.
+    - Documentation shuffled all around.
+    - new() can now take arguments for options.
+
+---
 version: 1.89
 date:    12 Sep 2003
 changes:

@@ -1,5 +1,5 @@
 package WWW::Yahoo::Groups::Mechanize;
-our $VERSION = '1.89';
+our $VERSION = '1.91';
 
 =head1 NAME
 
@@ -68,7 +68,7 @@ sub debug
 
 =head2 get
 
-We override L<<get|WWW::Mechanize/"$a->get()">> in order to
+We override L<< get|WWW::Mechanize/"$a->get()" >> in order to
 provide some behind the scenes actions.
 
 =over 4
@@ -82,13 +82,27 @@ We allow you to rate limit your downloading. See L</autosleep>.
 We automatically click Accept on adult confirmation. So I hope you agree
 to all that.
 
+=item * Debugging
+
+If L<debug|/debug> is enabled, then it will display a warning showing the
+URL.
+
 =back
 
 I should probably shift the advertisement interruption skipping
 into this method at some point, along with the redirect handling.
 
-A lot of the code in the sub will only be called if L</debug> is on.
-It's there to help me when Yahoo next change the page layout.
+It will throw a C<X::WWW::Yahoo::Groups::BadFetch> if
+it is unable to retrieve the specified page.
+
+Returns 0 if success, else an exception object.
+
+    my $rv = $y->get( 'http://groups.yahoo.com' );
+    $rv->rethrow if $rv;
+
+    # or, more idiomatically
+    $rv = $y->get( 'http://groups.yahoo.com' ) and $rv->rethrow;
+
 
 =cut
 
@@ -148,15 +162,16 @@ The default is 1 (as of 1.86).
 sub autosleep
 {
     my $w = shift;
+    my $key = __PACKAGE__.'-sleep';
     if (@_) {
 	my ($sleep) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
 		    'is integer' => sub { shift() =~ /^ \d+ $/x },
 		} }, # number
 	);
-	$w->{__PACKAGE__.'-sleep'} = $sleep;
+	$w->{$key} = $sleep;
     }
-    return $w->{__PACKAGE__.'-sleep'}||1;
+    return ( exists $w->{$key} ? $w->{$key} : 1 );
 }
 
 1;

@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More tests => 1;
-use Test::Signature;
 
-signature_ok();
+eval "use Test::Signature 1.04";
+SKIP: {
+    skip "Test::Signature 1.04 not installed.", 1 if $@;
+    signature_ok();
+}

@@ -4,7 +4,6 @@ BEGIN { use_ok 'WWW::Yahoo::Groups' }
 my $w = WWW::Yahoo::Groups->new();
 
 isa_ok( $w => 'WWW::Yahoo::Groups' );
-isa_ok( $w => 'WWW::Mechanize' );
 
 # Things to test. These are all meant to fail.
 
@@ -44,6 +43,7 @@ my %subs = (
 
     lists_toomany => sub { $w->lists( 5 ) },
     last_msg_id_toomany => sub { $w->last_msg_id( 5 ) },
+    first_msg_id_toomany => sub { $w->first_msg_id( 5 ) },
     loggedin_toomany => sub { $w->loggedin( 5 ) },
     logout_toomany => sub { $w->logout( 5 ) },
 

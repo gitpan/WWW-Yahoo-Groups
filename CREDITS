@@ -1,4 +1,4 @@
-CREDITS FOR WWW::Yahoo::Groups 1.7.8
+CREDITS FOR WWW::Yahoo::Groups 1.8.1
 
 Simon Hanmer for having problems with the module, thus resulting in
 improved error reporting, param validation and corrected prerequisites.
@@ -6,12 +6,15 @@ Since then, Simon also provided a basis for the lists() and
 last_msg_id() methods and is causing me to think harder about my
 exceptions.
 
-Aaron Straup Cope for writing XML::Filter::YahooGroups which
-uses this module for retrieving message bodies to put into RSS.
+Aaron Straup Cope (ASCOPE) for writing XML::Filter::YahooGroups
+which uses this module for retrieving message bodies to put into RSS.
 
-Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
+Randal Schwartz (MERLYN) for pointing out some problems back in 1.4.
 
-Autrijus Tang for Locale::Maketext::Lexicon and Sean M Burke for
-Locale::Maketext. With any luck this module is now appropriate
-internationalised, albeit not localised.
+Autrijus Tang (AUTRIJUS) for Locale::Maketext::Lexicon and Sean M
+Burke for Locale::Maketext. With any luck this module is now
+appropriate internationalised, albeit not localised.
+
+Ray Cielencki (SLINKY) for first_msg_id and "Age Restricted" notice
+bypassing.
 

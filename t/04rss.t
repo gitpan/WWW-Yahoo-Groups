@@ -1,10 +1,9 @@
-use Test::More tests => 24;
+use Test::More tests => 23;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
 
 isa_ok( $w => 'WWW::Yahoo::Groups' );
-isa_ok( $w => 'WWW::Mechanize' );
 
 # Our special user, as usual
 $w->login( 'perligain7ya5h00grrzogups' => 'redblacktrees' );

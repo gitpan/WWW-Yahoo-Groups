@@ -1,11 +1,10 @@
 use strict;
-use Test::More tests => 13;
+use Test::More tests => 16;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
 
 isa_ok( $w => 'WWW::Yahoo::Groups' );
-isa_ok( $w => 'WWW::Mechanize' );
 
 # Our special user
 $w->login( 'perligain7ya5h00grrzogups' => 'redblacktrees' );
@@ -19,6 +18,20 @@ if ($@ and ref $@ and $@->isa( 'X::WWW::Yahoo::Groups::NoListSet' )) {
     fail "No list set: unexpected error $@";
 } else {
     fail "No list set: received no error";
+}
+
+{
+    testlist( $w => 'www_yaho_t' );
+    my $first = eval { $w->first_msg_id() };
+    if ($@ and ref $@ and $@->isa( 'X::WWW::Yahoo::Groups' ) ) {
+	fail "first_msg_id(): ".$@->error;
+    } elsif ($@) {
+	fail "first_msg_id(): $@";
+    } else {
+	pass "first_msg_id(): Fetched a response";
+    }
+
+    is ($first => 1, "Message count is accurate ($first)");
 }
 
 {

@@ -2,14 +2,17 @@ Artistic
 AUTHORS
 Build.PL
 Build.pm
+ChangeLog
 Changes
 COPYING
 CREDITS
 examples/yahoo2maildir
 INSTALL
 lib/WWW/Yahoo/Groups.pm
+lib/WWW/Yahoo/Groups/Errors.pm
 lib/WWW/Yahoo/Groups/L10N.pm
 lib/WWW/Yahoo/Groups/L10N/en.po
+lib/WWW/Yahoo/Groups/Mechanize.pm
 LICENSE
 Makefile.PL
 MANIFEST
@@ -17,7 +20,6 @@ MANIFEST.SKIP
 META.yml
 README
 SIGNATURE
-t/00checkyaml.t
 t/00load.t
 t/00signature.t
 t/01login.t
@@ -29,4 +31,6 @@ t/06lastmsgid.t
 t/07sleep.t
 t/08logout.t
 t/09badfetch.t
+t/10agent.t
+t/99pod.t
 TODO

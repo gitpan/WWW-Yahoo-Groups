@@ -1,10 +1,9 @@
-use Test::More tests => 12;
+use Test::More tests => 11;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
 
 isa_ok( $w => 'WWW::Yahoo::Groups' );
-isa_ok( $w => 'WWW::Mechanize' );
 
 my $rv = eval { $w->logout() };
 if ($rv and ref $rv and $rv->isa('X::WWW::Yahoo::Groups::NotLoggedIn') ) {

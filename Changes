@@ -6,6 +6,20 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.8.1
+date:    22 May 2003
+changes:
+    - Some non-English groups have different page titles.
+    - Refactored use of Mechanize and thus Errors
+
+---
+version: 1.7.9
+date:    16 May 2003
+changes:
+    - Bypass "age restriction" notices. (ray c)
+    - Get first_msg_id as well as last_msg_id. (ray c)
+
+---
 version: 1.7.8
 date:    05 May 2003
 changes:

@@ -1,11 +1,10 @@
-use Test::More tests => 8;
+use Test::More tests => 7;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 {
     my $w = WWW::Yahoo::Groups->new();
 
     isa_ok( $w => 'WWW::Yahoo::Groups' );
-    isa_ok( $w => 'WWW::Mechanize' );
 
     ok ( !$w->loggedin, "We are not logged in");
 

@@ -1,10 +1,9 @@
-use Test::More tests => 4;
+use Test::More tests => 3;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
 
 isa_ok( $w => 'WWW::Yahoo::Groups' );
-isa_ok( $w => 'WWW::Mechanize' );
 
 my $rv =  $w->get( "http://dellah.org/doesnotexist") ;
 diag sprintf("rv <$rv> [%s] {%s}", ref($rv), ((ref $rv and $rv->can('fatal')) ? $rv->fatal : 'na'));

@@ -91,69 +91,19 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.78';
+our $VERSION = '1.81';
 
-use base 'WWW::Mechanize';
 use Carp;
 use HTTP::Cookies;
 use HTML::Entities;
 use Params::Validate qw( :all );
+use WWW::Yahoo::Groups::Mechanize;
 use WWW::Yahoo::Groups::L10N;
 our $lh = WWW::Yahoo::Groups::L10N->get_handle or die "Could not get localization handle!";
 
-require Exception::Class;
-Exception::Class->import(
-    'X::WWW::Yahoo::Groups' => {
-	description => $lh->maketext('An error related to WWW::Yahoo::Groups'),
-	fields => [qw( fatal )],
-    },
-    'X::WWW::Yahoo::Groups::BadParam' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('Invalid parameters specified for function'),
-    },
-    'X::WWW::Yahoo::Groups::BadLogin' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('For some reason, your login failed'),
-    },
-    'X::WWW::Yahoo::Groups::NoHere' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext(
-	    "The ``here'' link was not found on the login page."),
-    },
-    'X::WWW::Yahoo::Groups::AlreadyLoggedIn' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('You are already logged in with this object.'),
-    },
-    'X::WWW::Yahoo::Groups::NotLoggedIn' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('You must be logged in to perform that method.'),
-    },
-    'X::WWW::Yahoo::Groups::NoListSet' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('You tried accessing a method that required the list to be set'),
-    },
-    'X::WWW::Yahoo::Groups::UnexpectedPage' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('We received a page that I do not understand'),
-    },
-    'X::WWW::Yahoo::Groups::NotThere' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('The message you wanted is not in the archive'),
-    },
-    'X::WWW::Yahoo::Groups::BadFetch' => {
-	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('We tried fetching a page, but failed'),
-    },
-);
-sub X::WWW::Yahoo::Groups::is_error { 1 }
-
+require WWW::Yahoo::Groups::Errors; 
 Params::Validate::validation_options(
-    ignore_case => 1,
-    strip_leading => 1,
-    on_fail => sub {
-	chomp($_[0]);
-	X::WWW::Yahoo::Groups::BadParam->throw(error => $_[0], fatal => 1);
-    }
+    WWW::Yahoo::Groups::Errors->import($lh)
 );
 
 =head1 METHODS
@@ -169,11 +119,23 @@ Create a new C<WWW::Yahoo::Groups> robot.
 sub new
 {
     my $class = shift;
-    my $self = $class->SUPER::new(@_);
-    $self->cookie_jar({ });
-    $self->agent("Mozilla/5.0 (LWP; WWW::Mechanize)");
+    my $self = bless {}, $class;
+    my $w = WWW::Yahoo::Groups::Mechanize->new();
+    $self->agent($w);
     $self->debug(0);
     return bless $self, $class;
+}
+
+=head2 agent()
+
+Returns or sets the C<WWW::Mechanize> based agent. Not for general use.
+
+=cut
+
+sub agent
+{
+    my $self = shift;
+    @_ ? ( $self->{agent} = $_[0], $self ) : $self->{agent};
 }
 
 =head2 debug()
@@ -189,7 +151,11 @@ Enable/disable/read debugging mode.
 sub debug
 {
     my $self = shift;
-    $self->{__PACKAGE__.'-debug'} = ($_[0] ? 1 : 0) if @_;
+    if (@_) {
+	my $true = ($_[0] ? 1 : 0);
+	$self->{__PACKAGE__.'-debug'} = $true;
+	$self->agent->debug( $true );
+    }
     $self->{__PACKAGE__.'-debug'};
 }
 
@@ -217,37 +183,7 @@ Returns 0 if success, else an exception object.
 
 =cut
 
-sub get
-{
-    my $self = shift;
-    my $url = $_[0];
-    warn "Fetching $url\n" if $self->debug;
-    my $rv;
-    $rv = eval {
-	# Fetch page
-	my $rv = $self->SUPER::get(@_);
-	# Throw if problem
-	X::WWW::Yahoo::Groups::BadFetch->throw(error =>
-	    $lh->maketext("Unable to fetch [_1]: ", $url).
-	    $self->{res}->code.' - '.$self->{res}->message)
-		if ($self->{res}->is_error);
-	# Sleep for a bit
-	if (my $s = $self->autosleep() )
-	{
-	    sleep( $s );
-	}
-	# Return something
-	0;
-    };
-    if ($@) {
-	die $@ unless ref $@;
-	$@->rethrow if $@->fatal;
-	$rv = $@;
-    }
-    return $rv;
-}
-
-sub is_error { 0 }
+sub get { my $self = shift; $self->agent->get(@_) }
 
 =head2 autosleep()
 
@@ -264,40 +200,7 @@ C<sleep()> for the specified period after every fetch.
 
 =cut
 
-sub autosleep
-{
-    my $w = shift;
-    if (@_) {
-	my ($sleep) = validate_pos( @_,
-	    { type => SCALAR, callbacks => {
-		    $lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
-		    $lh->maketext('not negative') => sub { shift() >= 0 },
-		} }, # number
-	);
-	$w->{__PACKAGE__.'-sleep'} = $sleep;
-    }
-    return $w->{__PACKAGE__.'-sleep'}||0;
-}
-
-
-# field()
-
-# As per the method of the same name in C<WWW::Mechanize>,
-# but it doesn't unset the values when you are just reading
-# them.
-
-sub field {
-    my ($self, $name, $value, $number) = @_;
-    $number ||= 1;
-    my $form = $self->{form};
-    if ($number > 1) {
-	$form->find_input($name, $number)->value(
-	    (defined $value ? ($value) : ())
-	);
-    } else {
-	$form->value($name, (defined $value ? ($value) : ()));
-    }
-}
+sub autosleep { my $self = shift; $self->agent->autosleep(@_) }
 
 =head2 login()
 
@@ -335,24 +238,24 @@ C<logout()> method.
 
 sub login
 {
-    my $w = shift;
+    my $self = shift;
     my %p;
     @p{qw( user pass )} = validate_pos( @_,
 	{ type => SCALAR, }, # user
 	{ type => SCALAR, }, # pass
     );
+    my $w = $self->agent();
     my $rv = eval {
 	X::WWW::Yahoo::Groups::AlreadyLoggedIn->throw(
 	    $lh->maketext("You must logout before you can log in again."))
-		if $w->loggedin;
+		if $self->loggedin;
 
 	$w->get('http://groups.yahoo.com/');
 	$w->follow('Sign In');
 	$w->field( login => $p{user} );
 	$w->field( passwd => $p{pass} );
 	$w->click();
-	my $result = $w->{res}->content;
-	if (my ($error) = $result =~ m!
+	if (my ($error) = $w->res->content =~ m!
 	    \Q<font color=red face=arial><b>\E
 	    \s+
 	    (.*?)
@@ -368,14 +271,13 @@ sub login
 	{
 	    while (my $url = $w->res->header('Location'))
 	    {
-		$w->get( $url );
+		$self->get( $url );
 	    }
-	    my $content = $w->content;
-	    if ( $content =~ m[
+	    if ( $w->content =~ m[
 		\Qwindow.location.replace("http://groups.yahoo.com/");\E
 		]x )
 	    {
-		$w->{__PACKAGE__.'-loggedin'} = 1;
+		$self->{__PACKAGE__.'-loggedin'} = 1;
 	    } else {
 		X::WWW::Yahoo::Groups::BadLogin->throw(
 		    fatal => 1,
@@ -422,13 +324,14 @@ C<X::WWW::Yahoo::Groups::NotLoggedIn> if the bot is already logged out
 
 sub logout
 {
-    my $w = shift;
+    my $self = shift;
+    my $w = $self->agent;
     validate_pos( @_ );
     my $rv = eval {
 	X::WWW::Yahoo::Groups::NotLoggedIn->throw(
 	    $lh->maketext("You can not log out if you are not logged in."))
-		unless $w->loggedin;
-	delete $w->{__PACKAGE__.'-loggedin'};
+		unless $self->loggedin;
+	delete $self->{__PACKAGE__.'-loggedin'};
 
 	$w->get('http://groups.yahoo.com/');
 
@@ -437,14 +340,14 @@ sub logout
 		unless $w->follow('Sign Out');
 
 	$w->follow('Return to Yahoo! Groups');
-	my $res = $w->{res};
+	my $res = $w->res;
 	while ($res->is_redirect)
 	{
 	    # We do this manually because it doesn't work automatically for
 	    # some reason. I suspect we hit a redirection limit in LWP.
 	    my $url = $res->header('Location');
 	    $w->get($url);
-	    $res = $w->{res};
+	    $res = $w->res;
 	}
 	0;
     };
@@ -468,10 +371,10 @@ site has expired your session.
 
 sub loggedin
 {
-    my $w = shift;
+    my $self = shift;
     validate_pos( @_ );
-    if (exists $w->{__PACKAGE__.'-loggedin'}
-	    and $w->{__PACKAGE__.'-loggedin'})
+    if (exists $self->{__PACKAGE__.'-loggedin'}
+	    and $self->{__PACKAGE__.'-loggedin'})
     {
 	return 1;
     }
@@ -497,7 +400,7 @@ See also C<lists()> for how to get a list of possible lists.
 
 sub list
 {
-    my $w = shift;
+    my $self = shift;
     if (@_) {
 	my ($list) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
@@ -509,9 +412,10 @@ sub list
 		    },
 		}}, # list
 	);
-	$w->{__PACKAGE__.'-list'} = $list;
+	delete @{$self}{qw( first last )};
+	$self->{__PACKAGE__.'-list'} = $list;
     }
-    return $w->{__PACKAGE__.'-list'};
+    return $self->{__PACKAGE__.'-list'};
 }
 
 =head2 lists()
@@ -531,15 +435,16 @@ Note that it does handle people with more than one page of groups.
 
 sub lists
 {
-    my $w = shift;
+    my $self = shift;
     validate_pos( @_ );
     X::WWW::Yahoo::Groups::NotLoggedIn->throw(
 	$lh->maketext("Must be logged in to get a list of groups."))
-	    unless $w->loggedin;
+	    unless $self->loggedin;
 
     my %lists;
 
     my $next = 'http://groups.yahoo.com/mygroups';
+    my $w = $self->agent;
     do {
 	$w->get( $next );
 	undef $next;
@@ -556,6 +461,56 @@ sub lists
     } until ( not defined $next );
 
     return (sort keys %lists);
+}
+
+=head2 first_msg_id()
+
+Returns the lowest message number with the archive.
+
+    my $first = $w->first_msg_id();
+
+It will throw C<X::WWW::Yahoo::Groups::NoListSet> if no list has been
+specified with C<lists()>, C<X::WWW::Yahoo::Groups::UnexpectedPage> if
+the page fetched does not contain anything we thought it would, and
+C<X::WWW::Yahoo::Groups::BadFetch> if it is unable to fetch the page it
+needs.
+
+=cut
+
+sub get_extent
+{
+    my $self = shift;
+    validate_pos( @_ );
+    my $list = $self->list();
+    X::WWW::Yahoo::Groups::NoListSet->throw(
+	$lh->maketext("Cannot determine archive extent without a list being specified."))
+	    unless defined $list and length $list;
+
+    my $w = $self->agent;
+    $w->get( "http://groups.yahoo.com/group/$list/messages/1" );
+    my ($first, $last) = $w->res->content =~ m!
+	<TITLE>
+	[^<]+? : \s+
+	(\d+)-\d+ \s+ (?:of|/) \s+
+	(\d+)
+	[^<]*?
+	</TITLE>
+    !six;
+
+    X::WWW::Yahoo::Groups::UnexpectedPage->throw(
+	$lh->maketext("Unexpected title format. Perhaps group has no archive."))
+	    unless defined $first;
+
+    @{$self}{qw( first last )} = ( $first, $last );
+    return ( $first, $last );
+}
+
+sub first_msg_id
+{
+    my $self = shift;
+    validate_pos( @_ );
+    $self->get_extent unless exists $self->{first};
+    return $self->{first};
 }
 
 =head2 last_msg_id()
@@ -579,28 +534,10 @@ needs.
 
 sub last_msg_id
 {
-    my $w = shift;
+    my $self = shift;
     validate_pos( @_ );
-    my $list = $w->list();
-    X::WWW::Yahoo::Groups::NoListSet->throw(
-	$lh->maketext("Cannot determine archive extent without a list being specified."))
-	    unless defined $list and length $list;
-
-    $w->get( "http://groups.yahoo.com/group/$list/messages" );
-    my $content = $w->{res}->content;
-    my ($count) = $content =~ m!
-	<TITLE>
-	[^<]+?
-	\s+ of \s+
-	(\d+)
-	[^<]*?
-	<\/TITLE>
-    !six;
-    X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	$lh->maketext("Unexpected title format. Perhaps group has no archive."))
-	    unless defined $count;
-
-    return $count;
+    $self->get_extent unless exists $self->{last};
+    return $self->{last};
 }
 
 =head2 fetch_message()
@@ -645,27 +582,28 @@ the group).
 
 sub fetch_message
 {
-    my $w = shift;
+    my $self = shift;
     my ($number) = validate_pos( @_,
 	{ type => SCALAR, callbacks => {
 		$lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
 		$lh->maketext('greater than zero') => sub { shift() > 0 },
 	    } }, # number
     );
-    my $list = $w->list();
+    my $list = $self->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
 	$lh->maketext("Cannot fetch a message without a list being specified."))
 	unless defined $list and length $list;
     my $template = "http://groups.yahoo.com/group/$list/message/%d?source=1&unwrap=1";
+    my $w = $self->agent;
     $w->get(sprintf $template, $number);
-    my $res = $w->{res};
+    my $res = $w->res;
     while ($res->is_redirect)
     {
 	# We do this manually because it doesn't work automatically for
 	# some reason. I suspect we hit a redirection limit in LWP.
 	my $url = $res->header('Location');
 	$w->get($url);
-	$res = $w->{res};
+	$res = $w->res;
     }
     my $content = $res->content;
     if ($content =~ /\QYahoo! Groups is an advertising supported service.\E/gsm)
@@ -673,7 +611,7 @@ sub fetch_message
 	# If it's one of those damn interrupting ads, then click
 	# through.
 	$w->follow('Continue to message');
-	$res = $w->{res};
+	$res = $w->res;
 	$content = $res->content;
     }
 
@@ -727,7 +665,7 @@ The number must be between 1 and 100 inclusive.
 
 sub fetch_rss
 {
-    my $w = shift;
+    my $self = shift;
     my %opts;
     @opts{qw( count )} = validate_pos( @_,
 	{ type => SCALAR, optional => 1, callbacks => {
@@ -737,14 +675,15 @@ sub fetch_rss
 	    } }, # number
     );
     #             href="http://groups.yahoo.com/group/rss-dev/messages?rss=1&amp;viscount=30">
-    my $list = $w->list();
+    my $list = $self->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
 	$lh->maketext("Cannot fetch a list's RSS without a list being specified."))
 	    unless defined $list and length $list;
     my $url = "http://groups.yahoo.com/group/$list/messages?rss=1";
     $url .= "&viscount=$opts{count}" if $opts{count};
+    my $w = $self->agent;
     $w->get( $url );
-    my $content = $w->{res}->content;
+    my $content = $w->res->content;
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
 	$lh->maketext("Thought we were getting RSS. Got something else."))
             unless $content =~ m[^
@@ -752,7 +691,7 @@ sub fetch_rss
 		\s*
 		\Q<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"\E
     ]sx;
-    return $w->{res}->content;
+    return $content;
 }
 
 1;
@@ -766,19 +705,28 @@ Since then, Simon also provided a basis for the C<lists()> and
 C<last_msg_id()> methods and is causing me to think harder about my
 exceptions.
 
-Aaron Straup Cope for writing L<XML::Filter::YahooGroups> which
-uses this module for retrieving message bodies to put into RSS.
+Aaron Straup Cope (ASCOPE) for writing L<XML::Filter::YahooGroups>
+which uses this module for retrieving message bodies to put into RSS.
 
-Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
+Randal Schwartz (MERLYN) for pointing out some problems back in 1.4.
 
-Autrijus Tang for L<Locale::Maketext::Lexicon> and Sean M Burke for
-L<Locale::Maketext>. With any luck this module is now appropriate
-internationalised, albeit not localised.
+Autrijus Tang (AUTRIJUS) for L<Locale::Maketext::Lexicon> and Sean M
+Burke for L<Locale::Maketext>. With any luck this module is now
+appropriate internationalised, albeit not localised.
+
+Ray Cielencki (SLINKY) for C<first_msg_id> and "Age Restricted" notice
+bypassing.
 
 =head1 BUGS
 
-Please report bugs at <bug-www-yahoo-groups@rt.cpan.org>
-or via the web interface at L<http://rt.cpan.org>
+Support for this module is provided courtesy the CPAN RT system via
+the web or email:
+
+    http://perl.dellah.org/rt/yahoogroups
+    bug-www-yahoo-groups@rt.cpan.org
+
+This makes it much easier for me to track things and thus means
+your problem is less likely to be neglected.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -793,8 +741,9 @@ Iain Truskett <spoon@cpan.org>
 
 =head1 SEE ALSO
 
-L<perl>, L<WWW::Mechanize>, L<XML::Filter::YahooGroups>,
-L<Exception::Class>, L<http://groups.yahoo.com/>,
-L<Locale::Maketext>, L<Locale::Maketext::Lexicon>.
+L<perl>, L<XML::Filter::YahooGroups>, L<http://groups.yahoo.com/>.
+
+L<WWW::Mechanize>, L<Exception::Class>, L<Locale::Maketext>,
+L<Locale::Maketext::Lexicon>.
 
 =cut

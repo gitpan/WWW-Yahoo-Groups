@@ -3,7 +3,7 @@ use strict;
 use File::Spec;
 use blib;
 
-use Test::More tests => 11;
+use Test::More tests => 12;
 use Test::Differences;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
@@ -17,10 +17,15 @@ isa_ok( $w => 'WWW::Yahoo::Groups' );
         '210166020185013028048218004077247130134058139051251019' => 'iain-yg@dellah.org',
         '196215254161050095074248017165225149068211139159132031047192'.
         '240003217076123176191121043188239199223163025167119111252040'.
-        '233011227024073204157097255083229214' => '20030801122331.SQHR4342.fep08-svc.ttys.com@localhost'
+        '233011227024073204157097255083229214' => '20030801122331.SQHR4342.fep08-svc.ttys.com@localhost',
+        '06105623416517519021705001702815813107319222909302211620810008000319423'.
+        '31242170550071621880340120851441211000302151902340131900880832261060190'.
+        '74134142173139004212241202052031077123091049165235240216230234109192171'.
+        '210036247207155003253065165' =>
+            'sentto-4163449-682-1044260450-nerida_mills=yahoo.com.au@returns.groups.yahoo.com',
     );
 
-    for my $enc ( sort keys %enc )
+    for my $enc ( sort { $enc{$a} cmp $enc{$b} } keys %enc )
     {
         my $wanted = $enc{$enc};
         my $dec = $w->decode_protected( $enc );

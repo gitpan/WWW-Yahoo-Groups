@@ -36,25 +36,25 @@ from any CPAN site:
 Interim and development versions may also be available
 from the author's web site:
 
-    http://perl.dellah.org/
+    http://dellah.org/perl/
 
 WWW::Yahoo::Groups is distributed as a gzipped tar archive file:
 
     WWW-Yahoo-Groups-<version>.tar.gz
 
-where <version> represents the current version number, e.g. 1.87.
+where <version> represents the current version number, e.g. 1.88.
 
 To install the module, unpack the distribution archive to
 create an installation directory.  Something like this:
 
-    tar zxf WWW-Yahoo-Groups-1.87.tar.gz
+    tar zxf WWW-Yahoo-Groups-1.88.tar.gz
 or
-    gunzip WWW-Yahoo-Groups-1.87.tar.gz
-    tar xf WWW-Yahoo-Groups-1.87.tar
+    gunzip WWW-Yahoo-Groups-1.88.tar.gz
+    tar xf WWW-Yahoo-Groups-1.88.tar
 
 You can then 'cd' into the directory created,
 
-    cd WWW-Yahoo-Groups-1.87
+    cd WWW-Yahoo-Groups-1.88
 
 
 
@@ -124,7 +124,7 @@ If you have a copy of cpantest installed, type:
     % cpantest -g pass -nc -p `basename \`pwd\`` -auto
 
 Or:
-    % cpantest -g pass -nc -p WWW-Yahoo-Groups-1.87 -auto
+    % cpantest -g pass -nc -p WWW-Yahoo-Groups-1.88 -auto
 
 That will tell both me and other potential users that the module
 built correctly on your machine.

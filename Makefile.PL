@@ -3,14 +3,14 @@ WriteMakefile(
     NAME                => 'WWW::Yahoo::Groups',
     VERSION_FROM        => 'lib/WWW/Yahoo/Groups.pm',
     PREREQ_PM => {
-                'WWW::Mechanize' => '0.57',
-                'Params::Validate' => '0.65',
                 'Exception::Class' => '1.14',
                 'HTML::Entities' => '1.26',
                 'HTTP::Cookies' => '1.30',
                 'Net::SSL' => '2.77',
-                'Test::More' => '0.47',
+                'Params::Validate' => '0.65',
+                'WWW::Mechanize' => '0.57',
                 'Test::Differences' => '0.47',
+                'Test::More' => '0.47',
             },
     ($] >= 5.005 ?
       (ABSTRACT_FROM => 'lib/WWW/Yahoo/Groups.pm',

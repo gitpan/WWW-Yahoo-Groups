@@ -35,7 +35,8 @@ augmented with extra features.
 
 Try to be a well behaved bot and C<sleep()> for a few seconds (at least)
 after doing things. It's considered polite. There's a method
-C<autosleep()> that should be useful for this.
+C<autosleep()> that should be useful for this. Recently, this has been
+set to a default of 5 seconds. Feel free to tweak if necessary.
 
 If you're used to seeing munged email addresses when you view
 the message archive (i.e. you're not a moderator or owner of
@@ -91,7 +92,7 @@ As these are recognised flaws, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.87';
+our $VERSION = '1.88';
 
 use Carp;
 use HTTP::Cookies;
@@ -187,7 +188,7 @@ sub get { my $self = shift; $self->agent->get(@_) }
 =head2 autosleep()
 
 If given a parameter, it sets the numbers of seconds to sleep.
-Otherwise, it returns the number.
+Otherwise, it returns the number. Defaults to 5 seconds.
 
     $y->autosleep( 5 );
     sleep ( $y->autosleep() );

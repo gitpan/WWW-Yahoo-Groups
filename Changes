@@ -3,6 +3,12 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.88
+date:    11 Sep 2003
+changes:
+    - Updated mangling table.
+
+---
 version: 1.87
 date:    26 Aug 2003
 changes:

@@ -2,26 +2,26 @@
 # http://module-build.sourceforge.net/META-spec.html
 distribution_type: module
 name: WWW-Yahoo-Groups
-date: 26 Aug 2003
+date: 11 Sep 2003
 author: SPOON
-version: 1.87
+version: 1.88
 license: perl
 
 conflicts: {}
 
 build_requires:
-  Test::More: 0.47
   Test::Differences: 0.47
+  Test::More: 0.47
 recommends:
-  File::Find::Rule: 0.11
+  File::Find::Rule: 0.20
   Test::Pod: 0.95
 requires:
-  WWW::Mechanize: 0.57
-  Params::Validate: 0.65
   Exception::Class: 1.14
   HTML::Entities: 1.26
   HTTP::Cookies: 1.30
   Net::SSL: 2.77
+  Params::Validate: 0.65
+  WWW::Mechanize: 0.57
 
 private:
   directory:
@@ -31,16 +31,16 @@ private:
 provides:
   WWW::Yahoo::Groups:
     file: lib/WWW/Yahoo/Groups.pm
-    version: 1.87
+    version: 1.88
   WWW::Yahoo::Groups::Errors:
     file: lib/WWW/Yahoo/Groups/Errors.pm
-    version: 1.87
+    version: 1.88
   WWW::Yahoo::Groups::Mechanize:
     file: lib/WWW/Yahoo/Groups/Mechanize.pm
-    version: 1.87
+    version: 1.88
   WWW::Yahoo::Groups::Utils:
     file: lib/WWW/Yahoo/Groups/Utils.pm
-    version: 1.87
+    version: 1.88
 
 dynamic_config: 0
-generated_by: docmaker version 0.91
+generated_by: docmaker version 1.01

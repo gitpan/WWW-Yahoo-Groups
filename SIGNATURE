@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.34.
+signed via the Module::Signature module, version 0.35.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -17,20 +17,21 @@ Hash: SHA1
 SHA1 f53e893ce9aac84f4b5c82c172ea301cfa9888b3 AUTHORS
 SHA1 7a95fc8778fbce1f60d222e0d0d1dbb6c649461f Artistic
 SHA1 531e6b5c470d4726483fd68833391653eace0a92 COPYING
-SHA1 0de7a6d1f8e02fc068006fa7b7b2cec426f96a49 ChangeLog
-SHA1 6669e5cbc5712808237fa8421fa0460a22e9cd77 Changes
-SHA1 eaa3c404c122b252c360cc5e97fb708e5f96e8d2 INSTALL
-SHA1 a7d3214134190d70dd9c09217c291fa034de878a LICENSE
-SHA1 ca1697215d96dde66652e14a2874f2a21e2be2a1 MANIFEST
-SHA1 f3ec3ae6da365b2940298d02541ac3f73af8d350 MANIFEST.SKIP
-SHA1 7ec8798a923e648accd503d95090464b8ad1ae2d META.yml
-SHA1 8b20e2780c594e367e6d1af05b0429c8556ff80a Makefile.PL
-SHA1 f394984848482cb8808847567a3195a776a66664 README
+SHA1 98f0df55ab146f25fcd681e20a31064fecbba810 CREDITS
+SHA1 89007d21ba0beaa2cbfb77cab84008193e27e164 ChangeLog
+SHA1 a4c8e265f5269f2716a170a1f3cb24556930bee9 Changes
+SHA1 32c3edd5e045e3c05a3be13e738cd3d5ea78863a INSTALL
+SHA1 41a069c8b3e3feb53b656ed45fd5cac1ad7b7939 LICENCE
+SHA1 28efca0b50eaf78d31a8009d1271162b312bb90f MANIFEST
+SHA1 dad82fd52321fc055ec7294fc5eaf2fd0d3aec0f MANIFEST.SKIP
+SHA1 6b09e933835f2643b5dcab38945ccc94eb770bf6 META.yml
+SHA1 ec52c6db85d6f090db690cab001b2cf364e56e35 Makefile.PL
+SHA1 0d022b04217c627cb6ce5d0ec66a3cbe14478c11 README
 SHA1 71fdbb162035aa2a6443da811f056dfc279a2104 examples/yahoo2maildir
-SHA1 67a95f2fa965c17c2d7a3073a9c6f012e7afc382 lib/WWW/Yahoo/Groups.pm
-SHA1 acd5c3c5fdf33348031ea12e92dbe9fa3187e07a lib/WWW/Yahoo/Groups/Errors.pm
-SHA1 2bfe2add83acb769a8c41b0e8d0ef787f562ff75 lib/WWW/Yahoo/Groups/Mechanize.pm
-SHA1 87c8a6bd602a868cde21a7ec982cf8c4eeaaa04b lib/WWW/Yahoo/Groups/Utils.pm
+SHA1 e8edcbcd2c5c4cc23056c7749467f4754753a620 lib/WWW/Yahoo/Groups.pm
+SHA1 e1dde7c167a06addc2f0d47d063d288df3a72fe0 lib/WWW/Yahoo/Groups/Errors.pm
+SHA1 e7a9115d8128b7fd9c1617e11cdc59b01fb98fcb lib/WWW/Yahoo/Groups/Mechanize.pm
+SHA1 53d10c2cb70af09d0d0fb1a8d5d416578b3632c3 lib/WWW/Yahoo/Groups/Utils.pm
 SHA1 ff1347aed1f81b536966c27b0b57e6d14e68c57c t/00load.t
 SHA1 52ba32cbde27620f05367fd67737bb02249f478c t/01login.t
 SHA1 d9a64499ac09b3dfabb41bd89eee7a96118edb7a t/02badparam.t
@@ -43,16 +44,16 @@ SHA1 8803265971be907bd0f875663e2710a481f6f35e t/07sleep.t
 SHA1 b53f635f2abce331ce87d5587162aba0d85a22da t/08logout.t
 SHA1 e3530c1b73049b71ae397ce019b6d058a0748c0b t/09badfetch.t
 SHA1 d3474b3c5e84ba7d32b3aa1b4e7914bacb6d235b t/10agent.t
-SHA1 a42cdfa103758b2a607647a77c7a95f1a3fc265c t/12decode.t
-SHA1 a216b0928445955e2c8b48c850faef40d3328321 t/99pod.t
+SHA1 8698ab9d35eae2c6be74c5d42c941afd81cee1f2 t/12decode.t
+SHA1 1b89a318432048351d0511377d939a2815e8465f t/99pod.t
 SHA1 fd3f10755858c057f18376d45ab65b273c6e0e04 t/msgs_01.txt
 SHA1 e2f0b35bcd41b832d4705c7692fedae71e6a1f92 t/msgs_02.txt
 SHA1 b5df8c1f0313f9e72dbcf6987578cc26e5a6b606 t/msgs_12.txt
 SHA1 2707e91fd24cafbbab7863a32ec5f9e54272f6fe t/msgs_adult01.txt
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.2.1 (GNU/Linux)
+Version: GnuPG v1.2.3 (GNU/Linux)
 
-iD8DBQE/S1MRzL8gm6KQWMgRAmqcAKDDh5HhUm7ZSnJHFoTToM08yXAe3wCcCEPK
-NO5pFqbYRTY6NlyfTkQU3UY=
-=97uD
+iD8DBQE/YGcszL8gm6KQWMgRAh2FAKDAecIPTlGsgFg8FGx3XrYop53XaACeJc+v
+pudJnJJej2s7JT/XspVSB/k=
+=N/gn
 -----END PGP SIGNATURE-----

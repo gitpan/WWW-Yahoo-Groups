@@ -1,8 +1,6 @@
 WWW::Yahoo::Groups
 
-
-   automated access to Yahoo! Groups.
-
+    automated access to Yahoo! Groups.
 
 For installation details, see INSTALL.
 
@@ -10,21 +8,8 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.87 (26 Aug 2003)
-   - Hash randomisation problems fixed. Thanks merlyn.
-   - Corrected requirements.
-   - Automatic address demunging.
-   - Yahoo now using RSS 2.
-   - Yahoo have redone their pages, thus new content parser.
-   - Headers now reformatted by default.
-   - Autosleep is on 5 by default rather than 0. Yahoo
-     now throttle.
-   - Gone back to using our own agent rather than
-     agent_alias.
-   - Trailing newlines (except one) stripped from messages.
-   - Header continuations identification improved.
-   - Use proxies if available.
-   - Automatic address demunging added.
+Changes for 1.88 (11 Sep 2003)
+   - Updated mangling table.
 
 
 For a complete list of changes, see the Changes file.

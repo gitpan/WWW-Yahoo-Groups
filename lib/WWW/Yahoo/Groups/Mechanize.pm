@@ -1,5 +1,5 @@
 package WWW::Yahoo::Groups::Mechanize;
-our $VERSION = '1.87';
+our $VERSION = '1.88';
 our @ISA = qw( WWW::Mechanize );
 use WWW::Mechanize;
 use Net::SSL;

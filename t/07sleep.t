@@ -21,7 +21,7 @@ BEGIN { use_ok 'WWW::Yahoo::Groups' }
     my $diff = $after - $before;
     diag "autosleep(): $after - $before = $diff";
     # Logging in usually loads 4 pages.
-    my $logintime = $interval * 3;
+    my $logintime = $interval * 2;
     ok ( $diff > $logintime, "Either sleep or had a slow network connection." );
 
 }

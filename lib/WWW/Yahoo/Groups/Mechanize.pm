@@ -1,12 +1,15 @@
 package WWW::Yahoo::Groups::Mechanize;
-use base 'WWW::Mechanize';
+use vars qw( @ISA );
+@ISA = qw( WWW::Mechanize );
+use WWW::Mechanize;
 use Params::Validate qw( validate_pos SCALAR );
-use WWW::Yahoo::Groups::L10N;
-our $lh = WWW::Yahoo::Groups::L10N->get_handle or die "Could not get localization handle!";
+
 require WWW::Yahoo::Groups::Errors; 
 Params::Validate::validation_options(
-    WWW::Yahoo::Groups::Errors->import($lh)
+    WWW::Yahoo::Groups::Errors->import()
 );
+
+use IO::Socket::SSL;
 
 sub new
 {
@@ -35,7 +38,7 @@ sub get
 	my $rv = $self->SUPER::get(@_);
 	# Throw if problem
 	X::WWW::Yahoo::Groups::BadFetch->throw(error =>
-	    $lh->maketext("Unable to fetch [_1]: ", $url).
+	    "Unable to fetch $url: ".
 	    $self->res->code.' - '.$self->res->message)
 		if ($self->res->is_error);
 	# Sleep for a bit
@@ -62,8 +65,8 @@ sub autosleep
     if (@_) {
 	my ($sleep) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
-		    $lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
-		    $lh->maketext('not negative') => sub { shift() >= 0 },
+		    'is integer' => sub { shift() =~ /^ \d+ $/x },
+		    'not negative' => sub { shift() >= 0 },
 		} }, # number
 	);
 	$w->{__PACKAGE__.'-sleep'} = $sleep;

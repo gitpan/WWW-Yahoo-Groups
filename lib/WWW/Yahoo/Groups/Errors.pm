@@ -1,49 +1,46 @@
 package WWW::Yahoo::Groups::Errors;
 require Exception::Class;
-use WWW::Yahoo::Groups::L10N;
-our $lh = WWW::Yahoo::Groups::L10N->get_handle or die "Could not get localization handle!";
 
     Exception::Class->import(
 	'X::WWW::Yahoo::Groups' => {
-	    description => $lh->maketext('An error related to WWW::Yahoo::Groups'),
+	    description => 'An error related to WWW::Yahoo::Groups',
 	    fields => [qw( fatal )],
 	},
 	'X::WWW::Yahoo::Groups::BadParam' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('Invalid parameters specified for function'),
+	    description => 'Invalid parameters specified for function',
 	},
 	'X::WWW::Yahoo::Groups::BadLogin' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('For some reason, your login failed'),
+	    description => 'For some reason, your login failed',
 	},
 	'X::WWW::Yahoo::Groups::NoHere' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext(
-		"The ``here'' link was not found on the login page."),
+	    description => "The ``here'' link was not found on the login page.",
 	},
 	'X::WWW::Yahoo::Groups::AlreadyLoggedIn' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('You are already logged in with this object.'),
+	    description => 'You are already logged in with this object.',
 	},
 	'X::WWW::Yahoo::Groups::NotLoggedIn' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('You must be logged in to perform that method.'),
+	    description => 'You must be logged in to perform that method.',
 	},
 	'X::WWW::Yahoo::Groups::NoListSet' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('You tried accessing a method that required the list to be set'),
+	    description => 'You tried accessing a method that required the list to be set',
 	},
 	'X::WWW::Yahoo::Groups::UnexpectedPage' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('We received a page that I do not understand'),
+	    description => 'We received a page that I do not understand',
 	},
 	'X::WWW::Yahoo::Groups::NotThere' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('The message you wanted is not in the archive'),
+	    description => 'The message you wanted is not in the archive',
 	},
 	'X::WWW::Yahoo::Groups::BadFetch' => {
 	    isa => 'X::WWW::Yahoo::Groups',
-	    description => $lh->maketext('We tried fetching a page, but failed'),
+	    description => 'We tried fetching a page, but failed',
 	},
     );
 

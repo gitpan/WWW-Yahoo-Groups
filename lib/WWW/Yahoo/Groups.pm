@@ -91,19 +91,17 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.81';
+our $VERSION = '1.83';
 
 use Carp;
 use HTTP::Cookies;
 use HTML::Entities;
 use Params::Validate qw( :all );
 use WWW::Yahoo::Groups::Mechanize;
-use WWW::Yahoo::Groups::L10N;
-our $lh = WWW::Yahoo::Groups::L10N->get_handle or die "Could not get localization handle!";
 
 require WWW::Yahoo::Groups::Errors; 
 Params::Validate::validation_options(
-    WWW::Yahoo::Groups::Errors->import($lh)
+    WWW::Yahoo::Groups::Errors->import()
 );
 
 =head1 METHODS
@@ -247,7 +245,7 @@ sub login
     my $w = $self->agent();
     my $rv = eval {
 	X::WWW::Yahoo::Groups::AlreadyLoggedIn->throw(
-	    $lh->maketext("You must logout before you can log in again."))
+	    "You must logout before you can log in again.")
 		if $self->loggedin;
 
 	$w->get('http://groups.yahoo.com/');
@@ -265,7 +263,7 @@ sub login
 	{
 	    X::WWW::Yahoo::Groups::BadLogin->throw(
 		fatal => 1,
-		error => $lh->maketext($error));
+		error => $error);
 	}
 	else
 	{
@@ -281,7 +279,7 @@ sub login
 	    } else {
 		X::WWW::Yahoo::Groups::BadLogin->throw(
 		    fatal => 1,
-		    error => $lh->maketext("Nope. That's not a good login."));
+		    error => "Nope. That's not a good login.");
 	    }
 	}
 	0;
@@ -329,14 +327,14 @@ sub logout
     validate_pos( @_ );
     my $rv = eval {
 	X::WWW::Yahoo::Groups::NotLoggedIn->throw(
-	    $lh->maketext("You can not log out if you are not logged in."))
+	    "You can not log out if you are not logged in.")
 		unless $self->loggedin;
 	delete $self->{__PACKAGE__.'-loggedin'};
 
 	$w->get('http://groups.yahoo.com/');
 
 	X::WWW::Yahoo::Groups::NotLoggedIn->throw(
-	    $lh->maketext("You can not log out if you are not logged in."))
+	    "You can not log out if you are not logged in.")
 		unless $w->follow('Sign Out');
 
 	$w->follow('Return to Yahoo! Groups');
@@ -404,10 +402,10 @@ sub list
     if (@_) {
 	my ($list) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
-		    $lh->maketext('defined and of length') => sub {
+		    'defined and of length' => sub {
 			defined $_[0] and length $_[0]
 		    },
-		    $lh->maketext('appropriate characters') => sub {
+		    'appropriate characters' => sub {
 			$_[0] =~ /^ [\w-]+ $/x;
 		    },
 		}}, # list
@@ -438,7 +436,7 @@ sub lists
     my $self = shift;
     validate_pos( @_ );
     X::WWW::Yahoo::Groups::NotLoggedIn->throw(
-	$lh->maketext("Must be logged in to get a list of groups."))
+	"Must be logged in to get a list of groups.")
 	    unless $self->loggedin;
 
     my %lists;
@@ -483,7 +481,7 @@ sub get_extent
     validate_pos( @_ );
     my $list = $self->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
-	$lh->maketext("Cannot determine archive extent without a list being specified."))
+	"Cannot determine archive extent without a list being specified.")
 	    unless defined $list and length $list;
 
     my $w = $self->agent;
@@ -498,7 +496,7 @@ sub get_extent
     !six;
 
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	$lh->maketext("Unexpected title format. Perhaps group has no archive."))
+	"Unexpected title format. Perhaps group has no archive.")
 	    unless defined $first;
 
     @{$self}{qw( first last )} = ( $first, $last );
@@ -585,13 +583,13 @@ sub fetch_message
     my $self = shift;
     my ($number) = validate_pos( @_,
 	{ type => SCALAR, callbacks => {
-		$lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
-		$lh->maketext('greater than zero') => sub { shift() > 0 },
+		'is integer' => sub { shift() =~ /^ \d+ $/x },
+		'greater than zero' => sub { shift() > 0 },
 	    } }, # number
     );
     my $list = $self->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
-	$lh->maketext("Cannot fetch a message without a list being specified."))
+	"Cannot fetch a message without a list being specified.")
 	unless defined $list and length $list;
     my $template = "http://groups.yahoo.com/group/$list/message/%d?source=1&unwrap=1";
     my $w = $self->agent;
@@ -626,7 +624,7 @@ sub fetch_message
 	!smx)
     {
 	X::WWW::Yahoo::Groups::NotThere->throw(
-	    $lh->maketext("Message [_1] is not there.", $number));
+	    "Message $number is not there.");
     }
 
     # Strip content boundaries
@@ -641,7 +639,7 @@ sub fetch_message
     $content =~ s!  <a \s+ href=" [^"]+ "> ([^<]+) </a> !$1!smgx and
     $content =~ s/ <BR> //smgx or
 	X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	    $lh->maketext("Message [_1] doesn't appear to be formatted as we like it.", $number));
+	    "Message $number doesn't appear to be formatted as we like it.");
     decode_entities($content);
 
     # Return
@@ -669,15 +667,15 @@ sub fetch_rss
     my %opts;
     @opts{qw( count )} = validate_pos( @_,
 	{ type => SCALAR, optional => 1, callbacks => {
-		$lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
-		$lh->maketext('greater than zero') => sub { shift() > 0 },
-		$lh->maketext('less than or equal to one hundred') => sub { shift() <= 100 },
+		'is integer' => sub { shift() =~ /^ \d+ $/x },
+		'greater than zero' => sub { shift() > 0 },
+		'less than or equal to one hundred' => sub { shift() <= 100 },
 	    } }, # number
     );
     #             href="http://groups.yahoo.com/group/rss-dev/messages?rss=1&amp;viscount=30">
     my $list = $self->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
-	$lh->maketext("Cannot fetch a list's RSS without a list being specified."))
+	"Cannot fetch a list's RSS without a list being specified.")
 	    unless defined $list and length $list;
     my $url = "http://groups.yahoo.com/group/$list/messages?rss=1";
     $url .= "&viscount=$opts{count}" if $opts{count};
@@ -685,7 +683,7 @@ sub fetch_rss
     $w->get( $url );
     my $content = $w->res->content;
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	$lh->maketext("Thought we were getting RSS. Got something else."))
+	"Thought we were getting RSS. Got something else.")
             unless $content =~ m[^
 		\Q<?xml version="1.0"?>\E
 		\s*
@@ -710,10 +708,6 @@ which uses this module for retrieving message bodies to put into RSS.
 
 Randal Schwartz (MERLYN) for pointing out some problems back in 1.4.
 
-Autrijus Tang (AUTRIJUS) for L<Locale::Maketext::Lexicon> and Sean M
-Burke for L<Locale::Maketext>. With any luck this module is now
-appropriate internationalised, albeit not localised.
-
 Ray Cielencki (SLINKY) for C<first_msg_id> and "Age Restricted" notice
 bypassing.
 
@@ -730,7 +724,7 @@ your problem is less likely to be neglected.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright E<copy> Iain Truskett, 2002. All rights reserved.
+Copyright E<copy> Iain Truskett, 2002-2003. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -743,7 +737,6 @@ Iain Truskett <spoon@cpan.org>
 
 L<perl>, L<XML::Filter::YahooGroups>, L<http://groups.yahoo.com/>.
 
-L<WWW::Mechanize>, L<Exception::Class>, L<Locale::Maketext>,
-L<Locale::Maketext::Lexicon>.
+L<WWW::Mechanize>, L<Exception::Class>.
 
 =cut

@@ -6,6 +6,18 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.8.3
+date:    03 July 2003
+changes:
+    - Removed Advanced Technology to make Andy happy. 
+
+---
+version: 1.8.2
+date:    31 May 2003
+changes:
+    - Adult confirmations automatically handled.
+
+---
 version: 1.8.1
 date:    22 May 2003
 changes:

@@ -1,4 +1,4 @@
-use Test::More tests => 9;
+use Test::More tests => 10;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
@@ -166,3 +166,7 @@ EOF
 	fail("fetch 3 succeeded. Should not have");
     }
 }
+
+
+pass("All done");
+exit(0);

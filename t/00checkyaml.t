@@ -2,7 +2,12 @@ use Test::More tests => 6;
 $|=1;
 use strict;
 use warnings;
-BEGIN { use_ok 'YAML', qw( LoadFile Dump ) }
+
+SKIP: {
+    skip "No YAML", 6 unless eval { require YAML; 1 };
+    pass("We have YAML");
+    YAML->import(qw( LoadFile Dump ));
+
 
 # Check that the TODO file is fine
 {
@@ -67,7 +72,7 @@ foreach my $module (sort keys %requires)
     diag sprintf "%-30.30s %10s %10s", $module, $requires{$module}, $v;
 }
 diag "\n";
-
+}
 
 # Yada. Tidy away file loading.
 sub testload

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.05.
+signed via the Module::Signature module, version 0.13.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -15,23 +15,26 @@ not run its Makefile.PL or Build.PL.
 Hash: SHA1
 
 SHA1 7a95fc8778fbce1f60d222e0d0d1dbb6c649461f Artistic
-SHA1 4fdaac4fac5da0de4481de82f3c19d1195d8b840 Build.PL
+SHA1 377a2c1377ac2704d593647caacce85491e6a78b Build.PL
+SHA1 25e1b248cf6db54aa50c2dc3cd6bf2a3d95ca6ce Build.pm
 SHA1 95113c5e29065599f69a44be86f3df836d5ec6ea COPYING
-SHA1 567402f23c1d574e869a5d4192dc6a88d6db86d8 CREDITS
-SHA1 07a80b4a297fef892e1f2d7741e03a7143600f7a Changes
-SHA1 90bda731057f4c14127f36fe18a969e02ceab083 INSTALL
-SHA1 a7bc9110403a06606371ea0875698f6d5772107f LICENSE
-SHA1 da6e521d1a97cf69665ec2d1a6d6c06922d710a4 MANIFEST
+SHA1 c40c7734e82ae74235abefca3dda5a6fe6534755 CREDITS
+SHA1 ceae49867b156031cb2ada0e0c30ea3d6c81d2c8 Changes
+SHA1 b53e47c1b391a8f579369ba30ab0204fcb63bfa0 INSTALL
+SHA1 2a7f8d41d74c47aa9e13544f3f5378ec65f671db LICENSE
+SHA1 7985d61d769921c2fc5bdd29290b7982dce40e65 MANIFEST
 SHA1 dd9b7e9a705913c6b81487a26918a599503af32b MANIFEST.SKIP
-SHA1 e2ef04d6d9e9f937e0f8bb8a0d272ef0f40fcc3c META.yaml
+SHA1 738052d750b6bd496c791ccec3464f7f8fd26337 META.yaml
 SHA1 b42a665b5b51a19c37bc60259e5f322862a07c22 Makefile.PL
-SHA1 75bd50bdb78cf322b8e3059b7437d3dad00576a9 README
+SHA1 bd291732417cf550b4676b5eb8b32bfbbf076867 README
 SHA1 a58befbcc12a369f630ac0f12747f3a6eff7976b TODO
 SHA1 d20c9bec177d93827619883c7ca765682c369144 examples/yahoo2maildir
-SHA1 4efdee29a4ae5e4b0e2fd7a41056e74ce4df10c8 lib/WWW/Yahoo/Groups.pm
-SHA1 4087a572c377f679dea3aaece63bbbc4643fecca t/00checkyaml.t
+SHA1 c45ad98db57602fd80b9a3e68224beeb396d374e lib/WWW/Yahoo/Groups.pm
+SHA1 51a5b5d799601e4b070f3b7818632967374ea80b lib/WWW/Yahoo/Groups/L10N.pm
+SHA1 4fe56c9360c6934934d55dc10c592e4cc291d76f lib/WWW/Yahoo/Groups/L10N/en.po
+SHA1 cedae6832fc869f8e013a33276e6ada0085f8fa9 t/00checkyaml.t
 SHA1 ff1347aed1f81b536966c27b0b57e6d14e68c57c t/00load.t
-SHA1 0be93067dbd21c6b184fa59c3129da47b12d5ee8 t/00prereqs.t
+SHA1 cb5b1230a7834ed85bae22b5037c6fb4ac71ae30 t/00signature.t
 SHA1 c67f034a1b742c9e53e1c99e055d30d4cb3376a2 t/01login.t
 SHA1 dc40ef1dae5655a96d839531e250b2ab3fde843b t/02badparam.t
 SHA1 dce4f38a3b255a1832234719cd2de0a2860fb292 t/03message.t
@@ -43,7 +46,7 @@ SHA1 c356a6c3de04e654ed8c930b635490e14b98de7b t/08logout.t
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.2.0 (GNU/Linux)
 
-iD8DBQE9pOaKzL8gm6KQWMgRAoEVAJ9Uy2bMBH81Wjm49cOyymJpqRJJ1gCcD/rN
-zbWiBWCYxtJ7qNfqJFNEN5k=
-=PRma
+iD8DBQE9qj6gzL8gm6KQWMgRAqz2AKCqs1E9fn8lW9wqE6QQdmCrRRl2SwCfak7s
+SdmBDDcMcvnIpjSaW4viWtc=
+=i9YS
 -----END PGP SIGNATURE-----

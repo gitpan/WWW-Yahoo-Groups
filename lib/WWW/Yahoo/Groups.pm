@@ -91,48 +91,52 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.76';
+our $VERSION = '1.77';
 
 use base 'WWW::Mechanize';
 use Carp;
 use HTTP::Cookies;
 use HTML::Entities;
 use Params::Validate qw( :all );
-use Exception::Class (
+use WWW::Yahoo::Groups::L10N;
+our $lh = WWW::Yahoo::Groups::L10N->get_handle or die "Could not get localization handle!";
+
+require Exception::Class;
+Exception::Class->import(
     'X::WWW::Yahoo::Groups' => {
-	description => 'An error related to WWW::Yahoo::Groups'
+	description => $lh->maketext('An error related to WWW::Yahoo::Groups'),
     },
     'X::WWW::Yahoo::Groups::BadParam' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'Invalid parameters specified for function',
+	description => $lh->maketext('Invalid parameters specified for function'),
     },
     'X::WWW::Yahoo::Groups::BadLogin' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'For some reason, your login failed',
+	description => $lh->maketext('For some reason, your login failed'),
     },
     'X::WWW::Yahoo::Groups::AlreadyLoggedIn' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'You are already logged in with this object.',
+	description => $lh->maketext('You are already logged in with this object.'),
     },
     'X::WWW::Yahoo::Groups::NotLoggedIn' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'You must be logged in to perform that method.'
+	description => $lh->maketext('You must be logged in to perform that method.')
     },
     'X::WWW::Yahoo::Groups::NoListSet' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'You tried accessing a method that required the list to be set',
+	description => $lh->maketext('You tried accessing a method that required the list to be set'),
     },
     'X::WWW::Yahoo::Groups::UnexpectedPage' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'We received a page that I do not understand',
+	description => $lh->maketext('We received a page that I do not understand'),
     },
     'X::WWW::Yahoo::Groups::NotThere' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'The message you wanted is not in the archive',
+	description => $lh->maketext('The message you wanted is not in the archive'),
     },
     'X::WWW::Yahoo::Groups::BadFetch' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => 'We tried fetching a page, but failed',
+	description => $lh->maketext('We tried fetching a page, but failed'),
     },
 );
 
@@ -205,7 +209,7 @@ sub get
     warn "Fetching $url\n" if $self->debug;
     my $rv = $self->SUPER::get(@_);
     X::WWW::Yahoo::Groups::BadFetch->throw(
-	"Unable to fetch $url: ".$self->{res}->message)
+	$lh->maketext("Unable to fetch [_1]: ", $url).$self->{res}->message)
 	    if ($self->{res}->is_error);
     if (my $s = $self->autosleep() )
     {
@@ -235,8 +239,8 @@ sub autosleep
     if (@_) {
 	my ($sleep) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
-		    'is integer' => sub { shift() =~ /^ \d+ $/x },
-		    'not negative' => sub { shift() >= 0 },
+		    $lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
+		    $lh->maketext('not negative') => sub { shift() >= 0 },
 		} }, # number
 	);
 	$w->{__PACKAGE__.'-sleep'} = $sleep;
@@ -307,7 +311,7 @@ sub login
 	{ type => SCALAR, }, # pass
     );
     X::WWW::Yahoo::Groups::AlreadyLoggedIn->throw(
-	"You can only login once with each object.")
+	$lh->maketext("You can only login once with each object."))
 	    if $w->loggedin;
 
     $w->get('http://groups.yahoo.com/');
@@ -324,7 +328,7 @@ sub login
 	    \Q</b></font></td></tr></table>\E
 	!xsm)
     {
-	X::WWW::Yahoo::Groups::BadLogin->throw($error);
+	X::WWW::Yahoo::Groups::BadLogin->throw($lh->maketext($error));
     }
     else
     {
@@ -367,7 +371,7 @@ sub logout
     my $w = shift;
     validate_pos( @_ );
     X::WWW::Yahoo::Groups::NotLoggedIn->throw(
-	"You can not log out if you are not logged in.")
+	$lh->maketext("You can not log out if you are not logged in."))
 	    unless $w->loggedin;
 
     $w->get('http://groups.yahoo.com/');
@@ -431,10 +435,10 @@ sub list
     if (@_) {
 	my ($list) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
-		    'defined and of length' => sub {
+		    $lh->maketext('defined and of length') => sub {
 			defined $_[0] and length $_[0]
 		    },
-		    'appropriate characters' => sub {
+		    $lh->maketext('appropriate characters') => sub {
 			$_[0] =~ /^ [\w-]+ $/x;
 		    },
 		}}, # list
@@ -464,7 +468,7 @@ sub lists
     my $w = shift;
     validate_pos( @_ );
     X::WWW::Yahoo::Groups::NotLoggedIn->throw(
-	"Must be logged in to get a list of groups.")
+	$lh->maketext("Must be logged in to get a list of groups."))
 	    unless $w->loggedin;
 
     my %lists;
@@ -514,7 +518,7 @@ sub last_msg_id
     validate_pos( @_ );
     my $list = $w->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
-	"Cannot determine archive extent without a list being specified.")
+	$lh->maketext("Cannot determine archive extent without a list being specified."))
 	    unless defined $list and length $list;
 
     $w->get( "http://groups.yahoo.com/group/$list/messages" );
@@ -528,7 +532,7 @@ sub last_msg_id
 	<\/TITLE>
     !six;
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	"Unexpected title format. Perhaps group has no archive.")
+	$lh->maketext("Unexpected title format. Perhaps group has no archive."))
 	    unless defined $count;
 
     return $count;
@@ -579,12 +583,13 @@ sub fetch_message
     my $w = shift;
     my ($number) = validate_pos( @_,
 	{ type => SCALAR, callbacks => {
-		'is integer' => sub { shift() =~ /^ \d+ $/x },
-		'greater than zero' => sub { shift() > 0 },
+		$lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
+		$lh->maketext('greater than zero') => sub { shift() > 0 },
 	    } }, # number
     );
     my $list = $w->list();
-    X::WWW::Yahoo::Groups::NoListSet->throw("Cannot fetch a message without a list being specified.")
+    X::WWW::Yahoo::Groups::NoListSet->throw(
+	$lh->maketext("Cannot fetch a message without a list being specified."))
 	unless defined $list and length $list;
     my $template = "http://groups.yahoo.com/group/$list/message/%d?source=1&unwrap=1";
     $w->get(sprintf $template, $number);
@@ -617,7 +622,8 @@ sub fetch_message
 	</blockquote>
 	!smx)
     {
-	X::WWW::Yahoo::Groups::NotThere->throw("Message $number is not there.");
+	X::WWW::Yahoo::Groups::NotThere->throw(
+	    $lh->maketext("Message [_1] is not there.", $number));
     }
 
     # Strip content boundaries
@@ -632,7 +638,7 @@ sub fetch_message
     $content =~ s!  <a \s+ href=" [^"]+ "> ([^<]+) </a> !$1!smgx and
     $content =~ s/ <BR> //smgx or
 	X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	    "Message $number doesn't appear to be formatted as we like it.");
+	    $lh->maketext("Message [_1] doesn't appear to be formatted as we like it.", $number));
     decode_entities($content);
 
     # Return
@@ -660,22 +666,22 @@ sub fetch_rss
     my %opts;
     @opts{qw( count )} = validate_pos( @_,
 	{ type => SCALAR, optional => 1, callbacks => {
-		'is integer' => sub { shift() =~ /^ \d+ $/x },
-		'greater than zero' => sub { shift() > 0 },
-		'less than or equal to one hundred' => sub { shift() <= 100 },
+		$lh->maketext('is integer') => sub { shift() =~ /^ \d+ $/x },
+		$lh->maketext('greater than zero') => sub { shift() > 0 },
+		$lh->maketext('less than or equal to one hundred') => sub { shift() <= 100 },
 	    } }, # number
     );
     #             href="http://groups.yahoo.com/group/rss-dev/messages?rss=1&amp;viscount=30">
     my $list = $w->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
-	"Cannot fetch a list's RSS without a list being specified.")
+	$lh->maketext("Cannot fetch a list's RSS without a list being specified."))
 	    unless defined $list and length $list;
     my $url = "http://groups.yahoo.com/group/$list/messages?rss=1";
     $url .= "&viscount=$opts{count}" if $opts{count};
     $w->get( $url );
     my $content = $w->{res}->content;
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	"Thought we were getting RSS. Got something else.")
+	$lh->maketext("Thought we were getting RSS. Got something else."))
             unless $content =~ m[^
 		\Q<?xml version="1.0"?>\E
 		\s*
@@ -700,6 +706,10 @@ uses this module for retrieving message bodies to put into RSS.
 
 Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
 
+Autrijus Tang for L<Locale::Maketext::Lexicon> and Sean M Burke for
+L<Locale::Maketext>. With any luck this module is now appropriate
+internationalised, albeit not localised.
+
 =head1 BUGS
 
 Please report bugs at <bug-www-yahoo-groups@rt.cpan.org>
@@ -719,6 +729,7 @@ Iain Truskett <spoon@cpan.org>
 =head1 SEE ALSO
 
 L<perl>, L<WWW::Mechanize>, L<XML::Filter::YahooGroups>,
-L<Exception::Class>, L<http://groups.yahoo.com/>.
+L<Exception::Class>, L<http://groups.yahoo.com/>,
+L<Locale::Maketext>, L<Locale::Maketext::Lexicon>.
 
 =cut

@@ -1,5 +1,27 @@
 # Change log for WWW::Yahoo::Groups
 
+# All versions are available from http://perl.dellah.org/
+
+
+# The following versions are available on CPAN:
+
+---
+version: 1.7.7
+date:    14 Oct 2002
+changes:
+    - This file mentions the lines at which CPAN/BACKPAN are drawn.
+    - Aligned items in Build.PL =)
+    - Added Module::Signature test, for those with said module.
+    - >
+      Made it so Test::Prereq would not barf that Module::Signature is
+      not actually required. We just require a particular version
+      of Module::Signature if it is actually installed.
+    - I18N and L10N!
+    - Thus lots of new files and Build.PL extended massively.
+    - Remove Test::Prereq since it was having major problems.
+    - Added Test::Signature
+    - Skip YAML tests if YAML is not installed.
+
 ---
 version: 1.7.6
 date:    10 Oct 2002
@@ -76,6 +98,8 @@ changes:
     - MANIFEST file given comments on the purpose of each file.
     - It's been a fun release, hasn't it?
 
+# Versions below here are available on BACKPAN
+# http://history.perl.org/backpan/authors/id/S/SP/SPOON/
 ---
 version: 1.6
 date:    03 Oct 2002

@@ -10,15 +10,9 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.7.5 (10 Oct 2002)
-   - GPL renamed COPYING (to fit search.cpan.org)
-   - CREDITS file added (generated from POD)
-   - last_msg_id() added. Based on code from Simon Hanmer.
-   - Tests for last_msg_id() added.
-   - Brief note about being a well behaved bot added.
-   - list() ensures appropriate characters in list name.
-   - Automatically sleep() in get(), courtesy autosleep().
-   - Tests for sleep() added.
+Changes for 1.7.6 (10 Oct 2002)
+   - logout() added. Thus one can log in and out with the one bot.
+   - Appropriate tests added.
 
 
 by Iain Truskett.

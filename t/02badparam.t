@@ -1,4 +1,4 @@
-use Test::More tests => 31;
+use Test::More tests => 32;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
@@ -45,6 +45,7 @@ my %subs = (
     lists_toomany => sub { $w->lists( 5 ) },
     last_msg_id_toomany => sub { $w->last_msg_id( 5 ) },
     loggedin_toomany => sub { $w->loggedin( 5 ) },
+    logout_toomany => sub { $w->logout( 5 ) },
 
     fetch_rss_toomany => sub { $w->fetch_rss( 2, 3 ) },
     fetch_rss_string => sub { $w->fetch_rss( 'fnurdle' ) },

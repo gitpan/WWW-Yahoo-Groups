@@ -23,4 +23,5 @@ t/04rss.t                       Test we can retrieve RSS
 t/05lists.t                     Test loggedin() and lists()
 t/06lastmsgid.t                 Test last_msg_id()
 t/07sleep.t                     Test autosleep() and sleeping get()
+t/08logout.t                    Test logout()
 MANIFEST.SKIP                   Which files to never put in here

@@ -91,7 +91,7 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.75';
+our $VERSION = '1.76';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -331,6 +331,58 @@ sub login
 	$w->{__PACKAGE__.'-loggedin'} = 1;
 	$w->follow('here');
     }
+    return 1;
+}
+
+=head2 logout()
+
+Logs the robot out of the Yahoo! Groups system.
+
+    $y->logout();
+
+May throw:
+
+=over 4
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadFetch> if it cannot fetch any of the
+appropriate pages.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::NotLoggedIn> if the bot is already logged out
+(or never logged in).
+
+=back
+
+=cut
+
+sub logout
+{
+    my $w = shift;
+    validate_pos( @_ );
+    X::WWW::Yahoo::Groups::NotLoggedIn->throw(
+	"You can not log out if you are not logged in.")
+	    unless $w->loggedin;
+
+    $w->get('http://groups.yahoo.com/');
+    $w->follow('Sign Out');
+    $w->click();
+    my $res = $w->{res};
+    while ($res->is_redirect)
+    {
+	# We do this manually because it doesn't work automatically for
+	# some reason. I suspect we hit a redirection limit in LWP.
+	my $url = $res->header('Location');
+	$w->get($url);
+	$res = $w->{res};
+    }
+    delete $w->{__PACKAGE__.'-loggedin'};
     return 1;
 }
 

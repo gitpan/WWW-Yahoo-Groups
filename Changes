@@ -1,6 +1,13 @@
 # Change log for WWW::Yahoo::Groups
 
 ---
+version: 1.7.6
+date:    10 Oct 2002
+changes:
+    - logout() added. Thus one can log in and out with the one bot.
+    - Appropriate tests added.
+
+---
 version: 1.7.5
 date:    10 Oct 2002
 changes:

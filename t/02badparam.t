@@ -1,4 +1,4 @@
-use Test::More tests => 14;
+use Test::More tests => 19;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
@@ -24,12 +24,17 @@ my %subs = (
     login_insufficient => sub { $w->login( 'fnurdle' ) },
     login_toomany => sub { $w->login( 'fnurdle', 'knud', 'grue' ) },
     login_arrayref => sub { $w->login( [ 'fnurdle' ], [ 'gibberty' ] ) },
+    fetch_message_toomany => sub { $w->fetch_message( 2, 3 ) },
     fetch_message_string => sub { $w->fetch_message( 'fnurdle' ) },
     fetch_message_zero => sub { $w->fetch_message( 0 ) },
     fetch_message_undef => sub { $w->fetch_message( undef ) },
     list_blank => sub { $w->list( '' ) },
     list_toomany => sub { $w->list('fred', 'bob') },
-    fetch_rss_toomany => sub { $w->fetch_rss('moo') },
+    fetch_rss_toomany => sub { $w->fetch_rss( 2, 3 ) },
+    fetch_rss_string => sub { $w->fetch_rss( 'fnurdle' ) },
+    fetch_rss_zero => sub { $w->fetch_rss( 0 ) },
+    fetch_rss_hundred_one => sub { $w->fetch_rss( 101 ) },
+    fetch_rss_undef => sub { $w->fetch_rss( undef ) },
 );
 
 # Test that they all fail

@@ -1,6 +1,18 @@
 # Change log for WWW::Yahoo::Groups
 
 ---
+version: 1.7.2
+date:    09 Oct 2002
+changes:
+    - RSS fetching can fetch a particular number of items in the list.
+    - Thus, fetch_rss() can now take a parameter.
+    - Appropriate documentation updated, and validation extended.
+    - Test for giving fetch_message() too many params added.
+    - fetch_rss() param tests exapnded to cope with the new errors.
+    - RSS fetching tests verify number of items returned.
+    - And tests for fetching assorted boundary cases.
+
+---
 version: 1.7
 date:    08 Oct 2002
 changes:

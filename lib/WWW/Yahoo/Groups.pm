@@ -87,7 +87,7 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.70';
+our $VERSION = '1.72';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -419,17 +419,32 @@ containing the message bodies.
 
     my $rss = $w->fetch_rss();
 
+If a parameter is given, it will return that many items in the RSS file.
+The number must be between 1 and 100 inclusive.
+
+    my $rss = $w->fetch_rss( 10 );
+
 =cut
 
 sub fetch_rss
 {
     my $w = shift;
-    validate_pos( @_ );
+    my %opts;
+    @opts{qw( count )} = validate_pos( @_,
+	{ type => SCALAR, optional => 1, callbacks => {
+		'is integer' => sub { shift() =~ /^ \d+ $/x },
+		'greater than zero' => sub { shift() > 0 },
+		'less than or equal to one hundred' => sub { shift() <= 100 },
+	    } }, # number
+    );
+    #             href="http://groups.yahoo.com/group/rss-dev/messages?rss=1&amp;viscount=30">
     my $list = $w->list();
     X::WWW::Yahoo::Groups::NoListSet->throw(
 	"Cannot fetch a list's RSS without a list being specified.")
 	    unless defined $list and length $list;
-    $w->get( "http://groups.yahoo.com/group/$list/messages?rss=1" );
+    my $url = "http://groups.yahoo.com/group/$list/messages?rss=1";
+    $url .= "&viscount=$opts{count}" if $opts{count};
+    $w->get( $url );
     my $content = $w->{res}->content;
     X::WWW::Yahoo::Groups::UnexpectedPage->throw(
 	"Thought we were getting RSS. Got something else.")

@@ -1,4 +1,4 @@
-use Test::More tests => 19;
+use Test::More tests => 21;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
@@ -30,6 +30,8 @@ my %subs = (
     fetch_message_undef => sub { $w->fetch_message( undef ) },
     list_blank => sub { $w->list( '' ) },
     list_toomany => sub { $w->list('fred', 'bob') },
+    lists_toomany => sub { $w->lists( 5 ) },
+    loggedin_toomany => sub { $w->loggedin( 5 ) },
     fetch_rss_toomany => sub { $w->fetch_rss( 2, 3 ) },
     fetch_rss_string => sub { $w->fetch_rss( 'fnurdle' ) },
     fetch_rss_zero => sub { $w->fetch_rss( 0 ) },

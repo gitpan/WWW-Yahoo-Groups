@@ -10,14 +10,16 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.7.2 (09 Oct 2002)
-   - RSS fetching can fetch a particular number of items in the list.
-   - Thus, fetch_rss() can now take a parameter.
-   - Appropriate documentation updated, and validation extended.
-   - Test for giving fetch_message() too many params added.
-   - fetch_rss() param tests exapnded to cope with the new errors.
-   - RSS fetching tests verify number of items returned.
-   - And tests for fetching assorted boundary cases.
+Changes for 1.7.4 (10 Oct 2002)
+   - Tabs in MANIFEST now spaces.
+   - loggedin() added. Returns if one is logged in or not.
+   - lists() added. Based on code from Simon Hanmer.
+   - Documentation for list() clarified.
+   - New exceptions 'NotLoggedIn' and 'AlreadyLoggedIn'.
+   - Typo of 'gruop' instead of 'group' fixed.
+   - Tests for lists() and loggedin() added.
+   - login() throws an exception if one is already logged in.
+   - TODO list expanded for better re-login() handling.
 
 
 by Iain Truskett.

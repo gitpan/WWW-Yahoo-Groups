@@ -38,19 +38,19 @@ WWW::Yahoo::Groups is distributed as a gzipped tar archive file:
 
     WWW-Yahoo-Groups-<version>.tar.gz
 
-where <version> represents the current version number, e.g. 1.7.2.
+where <version> represents the current version number, e.g. 1.7.4.
 
 To install the module, unpack the distribution archive to
 create an installation directory.  Something like this:
 
-    tar zxf WWW-Yahoo-Groups-1.7.2.tar.gz
+    tar zxf WWW-Yahoo-Groups-1.7.4.tar.gz
 or
-    gunzip WWW-Yahoo-Groups-1.7.2.tar.gz
-    tar xf WWW-Yahoo-Groups-1.7.2.tar
+    gunzip WWW-Yahoo-Groups-1.7.4.tar.gz
+    tar xf WWW-Yahoo-Groups-1.7.4.tar
 
 You can then 'cd' into the directory created,
 
-    cd WWW-Yahoo-Groups-1.7.2
+    cd WWW-Yahoo-Groups-1.7.4
 
 
 INSTALLING MANUALLY

@@ -1,6 +1,20 @@
 # Change log for WWW::Yahoo::Groups
 
 ---
+version: 1.7.4
+date:    10 Oct 2002
+changes:
+    - Tabs in MANIFEST now spaces.
+    - loggedin() added. Returns if one is logged in or not.
+    - lists() added. Based on code from Simon Hanmer.
+    - Documentation for list() clarified.
+    - New exceptions 'NotLoggedIn' and 'AlreadyLoggedIn'.
+    - Typo of 'gruop' instead of 'group' fixed.
+    - Tests for lists() and loggedin() added.
+    - login() throws an exception if one is already logged in.
+    - TODO list expanded for better re-login() handling.
+
+---
 version: 1.7.2
 date:    09 Oct 2002
 changes:

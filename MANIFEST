@@ -8,7 +8,7 @@ Artistic                        The Artistic Licence
 GPL                             The GNU Public License
 Build.PL                        Script to make/install the module
 Makefile.PL                     Wrapper to call Build.PL
-MANIFEST			This list of files
+MANIFEST                        This list of files
 META.yaml                       Module metadata
 examples/yahoo2maildir          An example program
 lib/WWW/Yahoo/Groups.pm         The module
@@ -19,4 +19,5 @@ t/01login.t                     Test we can't login with bad id
 t/02badparam.t                  Test we can't given functions bad parameters
 t/03message.t                   Test we can retrieve messages
 t/04rss.t                       Test we can retrieve RSS
+t/05lists.t                     Test loggedin() and lists()
 MANIFEST.SKIP                   Which files to never put in here

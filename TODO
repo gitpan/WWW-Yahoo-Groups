@@ -1,3 +1,5 @@
 TODO:
   - Error handling.
   - Header restoration.
+  - Logout method.
+  - Login with different user/pass.

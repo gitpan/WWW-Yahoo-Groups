@@ -87,7 +87,7 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.72';
+our $VERSION = '1.74';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -105,6 +105,14 @@ use Exception::Class (
     'X::WWW::Yahoo::Groups::BadLogin' => {
 	isa => 'X::WWW::Yahoo::Groups',
 	description => 'For some reason, your login failed',
+    },
+    'X::WWW::Yahoo::Groups::AlreadyLoggedIn' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'You are already logged in with this object.',
+    },
+    'X::WWW::Yahoo::Groups::NotLoggedIn' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'You must be logged in to perform that method.'
     },
     'X::WWW::Yahoo::Groups::NoListSet' => {
 	isa => 'X::WWW::Yahoo::Groups',
@@ -237,8 +245,14 @@ C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
 
 =item *
 
-C<X::WWW::Yahoo::Groups::BadLogin> is unable to log in for some reason
+C<X::WWW::Yahoo::Groups::BadLogin> if unable to log in for some reason
 (error will be given the text of the Yahoo error).
+
+=item *
+
+C<X::WWW::Yahoo::Groups::AlreadyLoggedIn> if the object is already
+logged in. I intend to make this exception redundant, and add a
+C<logout()> method.
 
 =back
 
@@ -252,6 +266,9 @@ sub login
 	{ type => SCALAR, }, # user
 	{ type => SCALAR, }, # pass
     );
+    X::WWW::Yahoo::Groups::AlreadyLoggedIn->throw(
+	"You can only login once with each object.")
+	    if $w->loggedin;
 
     $w->get('http://groups.yahoo.com/');
     $w->follow('Sign in');
@@ -271,14 +288,38 @@ sub login
     }
     else
     {
+	$w->{__PACKAGE__.'-loggedin'} = 1;
 	$w->follow('here');
     }
     return 1;
 }
 
+=head2 loggedin()
+
+Returns 1 if you are logged in, else 0. Note that this merely tests if
+you've used the C<login()> method successfully, not whether the Yahoo!
+site has expired your session.
+
+   print "Logged in!\n" if $w->loggedin();
+
+=cut
+
+sub loggedin
+{
+    my $w = shift;
+    validate_pos( @_ );
+    if (exists $w->{__PACKAGE__.'-loggedin'}
+	    and $w->{__PACKAGE__.'-loggedin'})
+    {
+	return 1;
+    }
+    return 0;
+}
+
 =head2 list()
 
-Set/gets which list to use.
+If given a parameter, it sets the list to use. Otherwise, it returns
+the current list, or C<undef> if no list is set.
 
 B<IMPORTANT>: list name must be correctly cased as per how Yahoo! Groups
 cases it. If not, you may experience odd behaviour.
@@ -287,6 +328,8 @@ cases it. If not, you may experience odd behaviour.
     my $list = $y->list();
 
 May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
+
+See also C<lists()> for how to get a list of possible lists.
 
 =cut
 
@@ -304,6 +347,50 @@ sub list
 	$w->{__PACKAGE__.'-list'} = $list;
     }
     return $w->{__PACKAGE__.'-list'};
+}
+
+=head2 lists()
+
+If you'd like a list of the groups to which you are subscribed,
+then use this method.
+
+    my @groups = $w->lists();
+
+May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid
+parameters, or C<X::WWW::Yahoo::Groups::BadFetch> if it cannot fetch any
+of the appropriate pages from which it extracts the information.
+
+Note that it does handle people with more than one page of groups.
+
+=cut
+
+sub lists
+{
+    my $w = shift;
+    validate_pos( @_ );
+    X::WWW::Yahoo::Groups::NotLoggedIn->throw(
+	"Must be logged in to get a list of groups.")
+	    unless $w->loggedin;
+
+    my %lists;
+
+    my $next = 'http://groups.yahoo.com/mygroups';
+    do {
+	$w->get( $next );
+	undef $next;
+	my $links = $w->extract_links();
+	# [0]: the contents of the href attribute
+	# [1]: the text enclosed by the <A> tag
+	# [2]: the contents of the name attribute
+	for my $link (@$links)
+	{
+	    $next = $link->[0] if $link->[1] eq 'Next';
+	    next unless $link->[0] =~ m# /group/ ([\w-]+?) \Q?yguid=\E #x;
+	    $lists{$1} = 1;
+	}
+    } until ( not defined $next );
+
+    return (sort keys %lists);
 }
 
 =head2 fetch_message()
@@ -413,7 +500,7 @@ sub fetch_message
 
 =head2 fetch_rss()
 
-Returns the RSS for the gruop's most recent messages. See
+Returns the RSS for the group's most recent messages. See
 L<XML::Filter::YahooGroups> for ways to process this RSS into
 containing the message bodies.
 
@@ -461,9 +548,10 @@ __END__
 
 =head1 THANKS
 
-Simon Hanmer for having problems with the module, thus resulting
-in improved error reporting, param validation and corrected
-prerequisites.
+Simon Hanmer for having problems with the module, thus resulting in
+improved error reporting, param validation and corrected prerequisites.
+Since then, Simon also provided a basis for the C<lists()> method and
+is causing me to think harder about my exceptions.
 
 Aaron Straup Cope for writing L<XML::Filter::YahooGroups> which
 uses this module for retrieving message bodies to put into RSS.

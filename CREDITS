@@ -1,4 +1,4 @@
-CREDITS FOR WWW::Yahoo::Groups 1.7.7
+CREDITS FOR WWW::Yahoo::Groups 1.7.8
 
 Simon Hanmer for having problems with the module, thus resulting in
 improved error reporting, param validation and corrected prerequisites.
@@ -14,6 +14,4 @@ Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
 Autrijus Tang for Locale::Maketext::Lexicon and Sean M Burke for
 Locale::Maketext. With any luck this module is now appropriate
 internationalised, albeit not localised.
-
-
 

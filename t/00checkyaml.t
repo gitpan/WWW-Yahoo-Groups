@@ -21,8 +21,8 @@ SKIP: {
     diag Dump($todo),"\n";
 }
 
-# Check that the META.yaml file is fine, plus we need its information
-my $meta = (testload('META.yaml'))[0];
+# Check that the META.yml file is fine, plus we need its information
+my $meta = (testload('META.yml'))[0];
 diag Dump($meta);
 
 # Check that the changes file is fine and up to date.
@@ -49,13 +49,13 @@ diag Dump($meta);
     diag <<"DIAG";
 
 
-Build.PL  has <$version>
-Change log is <$latest->{version}>
-META.yaml has <$meta->{version}>
+Build.PL has <$version>
+Changelog is <$latest->{version}>
+META.yml has <$meta->{version}>
 
 DIAG
     is $latest->{version}, $version, 'Changes and Build.PL equal';
-    is $meta->{version}, $version, 'META.yaml and Build.PL equal';
+    is $meta->{version}, $version, 'META.yml and Build.PL equal';
     # (if those are equal, then all combinations are equal)
 }
 

@@ -1,0 +1,37 @@
+--- #YAML:1.0
+name: WWW-Yahoo-Groups
+version: 1.7.8
+license: perl
+distribution_type: module
+requires:
+  Exception::Class: 1.12
+  File::Basename: 2.4
+  File::Spec: 0.6
+  HTML::Entities: 1.25
+  HTTP::Cookies: 1.30
+  Locale::Maketext: 1.05
+  Locale::Maketext::Lexicon: 0.24
+  Params::Validate: 0.58
+  perl: 5.6.0
+recommends:
+  Test::Signature: 1.03
+build_requires:
+  Module::Signature: 0.13
+  Test::More: 0.47
+  Test::Signature: 1.01
+  YAML: 0.35
+conflicts: {}
+provides:
+  Build:
+    file: Build.pm
+    version: 0.11
+  WWW::Yahoo::Groups:
+    file: lib/WWW/Yahoo/Groups.pm
+    version: 1.78
+  WWW::Yahoo::Groups::L10N:
+    file: lib/WWW/Yahoo/Groups/L10N.pm
+    version: 1.00
+  WWW::Yahoo::Groups::L10N::_stub:
+    file: lib/WWW/Yahoo/Groups/L10N.pm
+    version: ~
+generated_by: Module::Build version 0.18

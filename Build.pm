@@ -4,6 +4,17 @@ use Module::Build 0.11;
 use base 'Module::Build';
 our $VERSION = 0.11;
 
+=head1 NAME
+
+Build.pm - Just provides i18n support for the build process.
+
+=head1 DESCRIPTION
+
+This is just to extend the method that finds files to install.
+In particular, it picks up F<.po> files.
+
+=cut
+
 sub ACTION_build {
     my ($self) = @_;
     $self->process_PL_files('lib');
@@ -27,5 +38,13 @@ sub lib_to_blib {
         }
     }
 }
+
+=head1 AUTHOR
+
+Autrijus Tang
+
+Modified by Iain Truskett <spoon@cpan.org>
+
+=cut
 
 1;

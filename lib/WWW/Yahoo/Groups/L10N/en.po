@@ -46,8 +46,8 @@ msgstr "We tried fetching a page, but failed"
 msgid "You can not log out if you are not logged in."
 msgstr "You can not log out if you are not logged in."
 
-msgid "You can only login once with each object."
-msgstr "You can only login once with each object."
+msgid "You must logout before you can log in again."
+msgstr "You must logout before you can log in again."
 
 msgid "Cannot determine archive extent without a list being specified."
 msgstr "Cannot determine archive extent without a list being specified."

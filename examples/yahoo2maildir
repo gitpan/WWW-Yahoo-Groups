@@ -4,11 +4,26 @@ use 5.006;
 use WWW::Yahoo::Groups;
 use File::Slurp;
 
+=head1 NAME
+
+yahoo2maildir - save Yahoo! Group to a Maildir
+
+=head1 DESCRIPTION
+
+With a little bit of customisation, this program will
+save a specified Yahoo! Group to a Maildir.
+
+Why Maildir? It's the simplest to do. Nice discrete files.
+For big groups, you may want ReisferFS though C<=)>
+
+=cut
+
 my $user  = 'someusername';
 my $pass  = 'somepassword';
 my $group = 'somegroupname';    # Casing is important.
 my $min   = 1;
-my $max   = 2000;
+my $max   = 2000; # (or use the $w->last_msg_id() method
+                  #  after logging in)
 my $dir   = 'jp';               # Maildir name
 
 my $w = WWW::Yahoo::Groups->new();
@@ -18,6 +33,8 @@ $w->login( $user => $pass );
 $w->list( $group );
 $w->requests_redirectable( [] );    # no redirects now
 
+$w->autosleep(20); # Be polite to the server
+
 mkdir $dir;
 mkdir "$dir/$_" for (qw( tmp new cur ));
 
@@ -26,11 +43,27 @@ for my $number ( $min .. $max )
 {
     my $fname = "$dir/new/$number.$group";
     next if -f $fname;
+    # We wrap it in an eval since it may throw an exception.
     my $content = eval { $w->fetch_message( $number ) };
     if ( $@ and $@->isa('X::WWW::Yahoo::Groups') ) {
+	# If it's one of our errors just continue
         warn "Could not handle message $num: ", $@->error, "\n";
+    } elsif ($@) {
+	# Otherwise, abort.
+	die;
     } else {
+	# If no error, save the file.
         write_file( $fname, $content );
-        sleep 20;
     }
 }
+
+=head1 AUTHOR
+
+Iain Truskett, <spoon@cpan.org>
+
+=head1 COPYRIGHT
+
+This script is public domain. Do what you will.
+
+=cut
+

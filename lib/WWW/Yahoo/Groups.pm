@@ -91,7 +91,7 @@ As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.77';
+our $VERSION = '1.78';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -105,6 +105,7 @@ require Exception::Class;
 Exception::Class->import(
     'X::WWW::Yahoo::Groups' => {
 	description => $lh->maketext('An error related to WWW::Yahoo::Groups'),
+	fields => [qw( fatal )],
     },
     'X::WWW::Yahoo::Groups::BadParam' => {
 	isa => 'X::WWW::Yahoo::Groups',
@@ -114,13 +115,18 @@ Exception::Class->import(
 	isa => 'X::WWW::Yahoo::Groups',
 	description => $lh->maketext('For some reason, your login failed'),
     },
+    'X::WWW::Yahoo::Groups::NoHere' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => $lh->maketext(
+	    "The ``here'' link was not found on the login page."),
+    },
     'X::WWW::Yahoo::Groups::AlreadyLoggedIn' => {
 	isa => 'X::WWW::Yahoo::Groups',
 	description => $lh->maketext('You are already logged in with this object.'),
     },
     'X::WWW::Yahoo::Groups::NotLoggedIn' => {
 	isa => 'X::WWW::Yahoo::Groups',
-	description => $lh->maketext('You must be logged in to perform that method.')
+	description => $lh->maketext('You must be logged in to perform that method.'),
     },
     'X::WWW::Yahoo::Groups::NoListSet' => {
 	isa => 'X::WWW::Yahoo::Groups',
@@ -139,13 +145,14 @@ Exception::Class->import(
 	description => $lh->maketext('We tried fetching a page, but failed'),
     },
 );
+sub X::WWW::Yahoo::Groups::is_error { 1 }
 
 Params::Validate::validation_options(
     ignore_case => 1,
     strip_leading => 1,
     on_fail => sub {
 	chomp($_[0]);
-	X::WWW::Yahoo::Groups::BadParam->throw($_[0]);
+	X::WWW::Yahoo::Groups::BadParam->throw(error => $_[0], fatal => 1);
     }
 );
 
@@ -182,8 +189,8 @@ Enable/disable/read debugging mode.
 sub debug
 {
     my $self = shift;
-    $self->{__PACKAGE__.'debug'} = ($_[0] ? 1 : 0) if @_;
-    $self->{__PACKAGE__.'debug'};
+    $self->{__PACKAGE__.'-debug'} = ($_[0] ? 1 : 0) if @_;
+    $self->{__PACKAGE__.'-debug'};
 }
 
 =head2 get()
@@ -197,8 +204,16 @@ sleep for that interval after successfully fetching a page.
     $y->get( 'http://groups.yahoo.com' );
 
 Generally, you won't need to use this method. It's used by a number of
-the othe rmethods and will throw a C<X::WWW::Yahoo::Groups::BadFetch> if
+the other methods and will throw a C<X::WWW::Yahoo::Groups::BadFetch> if
 it is unable to retrieve the specified page.
+
+Returns 0 if success, else an exception object.
+
+    my $rv = $y->get( 'http://groups.yahoo.com' );
+    $rv->rethrow if $rv;
+
+    # or, more idiomatically
+    my $rv = $y->get( 'http://groups.yahoo.com' ) and $rv->rethrow;
 
 =cut
 
@@ -207,16 +222,32 @@ sub get
     my $self = shift;
     my $url = $_[0];
     warn "Fetching $url\n" if $self->debug;
-    my $rv = $self->SUPER::get(@_);
-    X::WWW::Yahoo::Groups::BadFetch->throw(
-	$lh->maketext("Unable to fetch [_1]: ", $url).$self->{res}->message)
-	    if ($self->{res}->is_error);
-    if (my $s = $self->autosleep() )
-    {
-	sleep( $s );
+    my $rv;
+    $rv = eval {
+	# Fetch page
+	my $rv = $self->SUPER::get(@_);
+	# Throw if problem
+	X::WWW::Yahoo::Groups::BadFetch->throw(error =>
+	    $lh->maketext("Unable to fetch [_1]: ", $url).
+	    $self->{res}->code.' - '.$self->{res}->message)
+		if ($self->{res}->is_error);
+	# Sleep for a bit
+	if (my $s = $self->autosleep() )
+	{
+	    sleep( $s );
+	}
+	# Return something
+	0;
+    };
+    if ($@) {
+	die $@ unless ref $@;
+	$@->rethrow if $@->fatal;
+	$rv = $@;
     }
     return $rv;
 }
+
+sub is_error { 0 }
 
 =head2 autosleep()
 
@@ -310,32 +341,55 @@ sub login
 	{ type => SCALAR, }, # user
 	{ type => SCALAR, }, # pass
     );
-    X::WWW::Yahoo::Groups::AlreadyLoggedIn->throw(
-	$lh->maketext("You can only login once with each object."))
-	    if $w->loggedin;
+    my $rv = eval {
+	X::WWW::Yahoo::Groups::AlreadyLoggedIn->throw(
+	    $lh->maketext("You must logout before you can log in again."))
+		if $w->loggedin;
 
-    $w->get('http://groups.yahoo.com/');
-    $w->follow('Sign in');
-    $w->field( login => $p{user} );
-    $w->field( passwd => $p{pass} );
-    $w->click();
-    my $result = $w->{res}->content;
-    if (my ($error) = $result =~ m!
+	$w->get('http://groups.yahoo.com/');
+	$w->follow('Sign In');
+	$w->field( login => $p{user} );
+	$w->field( passwd => $p{pass} );
+	$w->click();
+	my $result = $w->{res}->content;
+	if (my ($error) = $result =~ m!
 	    \Q<font color=red face=arial><b>\E
 	    \s+
 	    (.*?)
 	    \s+
 	    \Q</b></font></td></tr></table>\E
-	!xsm)
-    {
-	X::WWW::Yahoo::Groups::BadLogin->throw($lh->maketext($error));
+	    !xsm)
+	{
+	    X::WWW::Yahoo::Groups::BadLogin->throw(
+		fatal => 1,
+		error => $lh->maketext($error));
+	}
+	else
+	{
+	    while (my $url = $w->res->header('Location'))
+	    {
+		$w->get( $url );
+	    }
+	    my $content = $w->content;
+	    if ( $content =~ m[
+		\Qwindow.location.replace("http://groups.yahoo.com/");\E
+		]x )
+	    {
+		$w->{__PACKAGE__.'-loggedin'} = 1;
+	    } else {
+		X::WWW::Yahoo::Groups::BadLogin->throw(
+		    fatal => 1,
+		    error => $lh->maketext("Nope. That's not a good login."));
+	    }
+	}
+	0;
+    };
+    if ($@) {
+	die $@ unless ref $@;
+	$@->rethrow if $@->fatal;
+	$rv = $@;
     }
-    else
-    {
-	$w->{__PACKAGE__.'-loggedin'} = 1;
-	$w->follow('here');
-    }
-    return 1;
+    return $rv;
 }
 
 =head2 logout()
@@ -370,24 +424,36 @@ sub logout
 {
     my $w = shift;
     validate_pos( @_ );
-    X::WWW::Yahoo::Groups::NotLoggedIn->throw(
-	$lh->maketext("You can not log out if you are not logged in."))
-	    unless $w->loggedin;
+    my $rv = eval {
+	X::WWW::Yahoo::Groups::NotLoggedIn->throw(
+	    $lh->maketext("You can not log out if you are not logged in."))
+		unless $w->loggedin;
+	delete $w->{__PACKAGE__.'-loggedin'};
 
-    $w->get('http://groups.yahoo.com/');
-    $w->follow('Sign Out');
-    $w->click();
-    my $res = $w->{res};
-    while ($res->is_redirect)
-    {
-	# We do this manually because it doesn't work automatically for
-	# some reason. I suspect we hit a redirection limit in LWP.
-	my $url = $res->header('Location');
-	$w->get($url);
-	$res = $w->{res};
+	$w->get('http://groups.yahoo.com/');
+
+	X::WWW::Yahoo::Groups::NotLoggedIn->throw(
+	    $lh->maketext("You can not log out if you are not logged in."))
+		unless $w->follow('Sign Out');
+
+	$w->follow('Return to Yahoo! Groups');
+	my $res = $w->{res};
+	while ($res->is_redirect)
+	{
+	    # We do this manually because it doesn't work automatically for
+	    # some reason. I suspect we hit a redirection limit in LWP.
+	    my $url = $res->header('Location');
+	    $w->get($url);
+	    $res = $w->{res};
+	}
+	0;
+    };
+    if ($@) {
+	die $@ unless ref $@;
+	$@->rethrow if $@->fatal;
+	$rv = $@;
     }
-    delete $w->{__PACKAGE__.'-loggedin'};
-    return 1;
+    return $rv;
 }
 
 =head2 loggedin()
@@ -511,7 +577,6 @@ needs.
 
 =cut
 
-
 sub last_msg_id
 {
     my $w = shift;
@@ -614,9 +679,9 @@ sub fetch_message
 
     # See if it's a missing article.
     if ($content =~ m!
-	<blockquote>
-	\s+
 	<br>
+	\s+
+	<blockquote>
 	\s+
 	\QMessage $number does not exist in $list\E
 	</blockquote>

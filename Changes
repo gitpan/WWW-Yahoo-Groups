@@ -6,6 +6,17 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.7.8
+date:    05 May 2003
+changes:
+    - Error handling renovated.
+    - Example script documented.
+    - Example script uses autosleep() now.
+    - Build.pm auxiliary file documented.
+    - Relogin message corrected for new features.
+    - Updated for some changes Yahoo made to the pages.
+
+---
 version: 1.7.7
 date:    14 Oct 2002
 changes:

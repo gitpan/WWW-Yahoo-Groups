@@ -1,30 +1,32 @@
-README                          Basic information about this module
-SIGNATURE                       Cryptographic signature of these files
-Changes                         List of changes made in each revision
-INSTALL                         Installation instructions
-TODO                            Things yet to do to the module
-CREDITS                         A list of thanks
-LICENSE                         License and copyright
-Artistic                        The Artistic Licence
-COPYING                         The GNU Public License
-Build.PL                        Script to make/install the module
-Makefile.PL                     Wrapper to call Build.PL
-MANIFEST                        This list of files
-META.yaml                       Module metadata
-examples/yahoo2maildir          An example program
-lib/WWW/Yahoo/Groups.pm         The module
-t/00load.t                      Test that the module loads
-t/00checkyaml.t                 Test files are well formed and appropriate
-t/00signature.t                 Test the package is correctly signed
-t/01login.t                     Test we can't login with bad id
-t/02badparam.t                  Test we can't given functions bad parameters
-t/03message.t                   Test we can retrieve messages
-t/04rss.t                       Test we can retrieve RSS
-t/05lists.t                     Test loggedin() and lists()
-t/06lastmsgid.t                 Test last_msg_id()
-t/07sleep.t                     Test autosleep() and sleeping get()
-t/08logout.t                    Test logout()
-MANIFEST.SKIP                   Which files to never put in here
-Build.pm                        Build.PL support
-lib/WWW/Yahoo/Groups/L10N.pm    Internationalisation support
-lib/WWW/Yahoo/Groups/L10N/en.po English (AU)
+Artistic
+AUTHORS
+Build.PL
+Build.pm
+Changes
+COPYING
+CREDITS
+examples/yahoo2maildir
+INSTALL
+lib/WWW/Yahoo/Groups.pm
+lib/WWW/Yahoo/Groups/L10N.pm
+lib/WWW/Yahoo/Groups/L10N/en.po
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+SIGNATURE
+t/00checkyaml.t
+t/00load.t
+t/00signature.t
+t/01login.t
+t/02badparam.t
+t/03message.t
+t/04rss.t
+t/05lists.t
+t/06lastmsgid.t
+t/07sleep.t
+t/08logout.t
+t/09badfetch.t
+TODO

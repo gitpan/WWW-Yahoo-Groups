@@ -9,8 +9,11 @@ isa_ok( $w => 'WWW::Mechanize' );
 eval {
     $w->login('fnurdle' => 'gibberty');
 };
-if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups::BadLogin')) {
+if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
     pass("Login failed: ".$@->error);
+} elsif ( $@ ) {
+    fail("Unexpected error.");
+    diag $@;
 } else {
     fail("Login succeeded, despite being meant to fail.");
 }

@@ -1,5 +1,9 @@
 Change log for WWW::Yahoo::Groups
 
+1.5 - But it helps to not mess up the MB scripts. Ta Merlyn.
+
+1.4 - Module::Build is nicer than MM
+
 1.3 - Added SIGNATURE (Module::Signature)
     - Added example program.
     - Refined doco.

@@ -1,13 +1,13 @@
+Build.PL
 Changes
-lib/WWW/Yahoo/Groups.pm
 MANIFEST			This list of files
+META.yaml
 Makefile.PL
 README
+SIGNATURE
+examples/yahoo2maildir
+lib/WWW/Yahoo/Groups.pm
 t/00load.t
 t/01login.t
 t/02badparam.t
 t/03message.t
-SIGNATURE
-examples/yahoo2maildir
-Build.PL
-META.yaml

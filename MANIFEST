@@ -1,5 +1,5 @@
 Changes
-Groups.pm
+lib/WWW/Yahoo/Groups.pm
 MANIFEST			This list of files
 Makefile.PL
 README
@@ -9,3 +9,5 @@ t/02badparam.t
 t/03message.t
 SIGNATURE
 examples/yahoo2maildir
+Build.PL
+META.yaml

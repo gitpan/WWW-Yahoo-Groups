@@ -1,5 +1,23 @@
 package WWW::Yahoo::Groups::Mechanize;
-our $VERSION = '1.88';
+our $VERSION = '1.89';
+
+=head1 NAME
+
+WWW::Yahoo::Groups::Mechanize - Control WWW::Mechanize for WYG.
+
+=head1 DESCRIPTION
+
+This module is a subclass of L<WWW::Mechanize> that permits us a bit
+more control over some aspects of the fetching behaviour.
+
+=head1 INHERITANCE
+
+This module inherits from L<WWW::Mechanize>, which inherits from
+L<LWP::UserAgent>. As such, any method available to either of them is
+available here. Any overridden methods will be explained below.
+
+=cut
+
 our @ISA = qw( WWW::Mechanize );
 use WWW::Mechanize;
 use Net::SSL;
@@ -12,15 +30,34 @@ Params::Validate::validation_options(
     WWW::Yahoo::Groups::Errors->import()
 );
 
+=head1 CONSTRUCTOR
+
+=head2 new
+
+As for L<WWW::Mechanize/"new()"> but sets the agent string
+to our custom agent.
+
+=cut
+
 sub new
 {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
-    $self->cookie_jar({ });
     $self->agent("Mozilla/5.0 (LWP; $class)");
-    $self->env_proxy();
     return $self;
 }
+
+=head1 METHODS
+
+=head2 debug
+
+Sets or gets whether we are in debugging mode. Returns true
+if set, else false.
+
+     warn "Awooga!" if $self->debug;
+     $self->debug( 1 );
+
+=cut
 
 sub debug
 {
@@ -28,6 +65,32 @@ sub debug
     $self->{__PACKAGE__.'-debug'} = ($_[0] ? 1 : 0) if @_;
     $self->{__PACKAGE__.'-debug'};
 }
+
+=head2 get
+
+We override L<<get|WWW::Mechanize/"$a->get()">> in order to
+provide some behind the scenes actions.
+
+=over 4
+
+=item * Sleeping
+
+We allow you to rate limit your downloading. See L</autosleep>.
+
+=item * Automatic adult confirmation
+
+We automatically click Accept on adult confirmation. So I hope you agree
+to all that.
+
+=back
+
+I should probably shift the advertisement interruption skipping
+into this method at some point, along with the redirect handling.
+
+A lot of the code in the sub will only be called if L</debug> is on.
+It's there to help me when Yahoo next change the page layout.
+
+=cut
 
 sub get
 {
@@ -72,7 +135,15 @@ sub get
     return $rv;
 }
 
-sub is_error { 0 }
+=head2 autosleep
+
+Allows one to configure the sleep period between fetches
+The default is 1 (as of 1.86).
+
+    my $period = $ua->autosleep;
+    $ua->autosleep( 10 ); # for a 10 second delay
+
+=cut
 
 sub autosleep
 {
@@ -85,7 +156,19 @@ sub autosleep
 	);
 	$w->{__PACKAGE__.'-sleep'} = $sleep;
     }
-    return $w->{__PACKAGE__.'-sleep'}||5;
+    return $w->{__PACKAGE__.'-sleep'}||1;
 }
 
 1;
+
+__DATA__
+
+=head1 BUGS, THANKS, LICENCE, etc.
+
+See L<WWW::Yahoo::Groups>
+
+=head1 AUTHOR
+
+Iain Truskett <spoon@cpan.org>
+
+=cut

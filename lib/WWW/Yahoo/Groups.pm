@@ -36,7 +36,7 @@ augmented with extra features.
 Try to be a well behaved bot and C<sleep()> for a few seconds (at least)
 after doing things. It's considered polite. There's a method
 C<autosleep()> that should be useful for this. Recently, this has been
-set to a default of 5 seconds. Feel free to tweak if necessary.
+set to a default of 1 second. Feel free to tweak if necessary.
 
 If you're used to seeing munged email addresses when you view
 the message archive (i.e. you're not a moderator or owner of
@@ -52,32 +52,25 @@ subclass of C<Exception::Class>.
 
 =item *
 
-Handles access restricted archives. It lets you login.
+B<Handles access to restricted archives.> It lets you login.
 
 =item *
 
-Handles the intermittent advertisements. It notes that it got one and
+B<Handles the intermittent advertisements.> It notes that it got one and
 progresses straight to the message.
 
 =item *
 
-Handles attachments. We get the source which happens to be the raw stuff.
+B<Handle adult confirmation requests.> It just goes straight on.
 
 =item *
 
-Sanity checking. Could be improved, but it will generally barf if it
+B<Handles attachments.> We get the source which happens to be the raw stuff.
+
+=item *
+
+B<Sanity checking.> Could be improved, but it will generally barf if it
 doesn't understand something.
-
-=back
-
-=head2 Things it is yet to do
-
-=over 4
-
-=item *
-
-B<Handle errors.> Well, it does, but not as gracefully as it might in
-some situations.
 
 =item *
 
@@ -88,11 +81,9 @@ being a moderator on the lists in question.
 
 =back
 
-As these are recognised flaws, they are on the F<TODO> list.
-
 =cut
 
-our $VERSION = '1.88';
+our $VERSION = '1.89';
 
 use Carp;
 use HTTP::Cookies;
@@ -188,9 +179,9 @@ sub get { my $self = shift; $self->agent->get(@_) }
 =head2 autosleep()
 
 If given a parameter, it sets the numbers of seconds to sleep.
-Otherwise, it returns the number. Defaults to 5 seconds.
+Otherwise, it returns the number. Defaults to 1 seconds.
 
-    $y->autosleep( 5 );
+    $y->autosleep( 5 ); # Set it to 5.
     sleep ( $y->autosleep() );
 
 May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.

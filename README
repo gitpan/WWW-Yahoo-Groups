@@ -8,7 +8,11 @@ For usage, see the doco. Either use perldoc or view it
 on the web at:
     <http://search.cpan.org/author/SPOON/WWW-Yahoo-Groups/>
 
-Changes for 1.88 (11 Sep 2003)
+Changes for 1.89 (12 Sep 2003)
+   - Documented auxiliary classes.
+   - Updated some aspects of Mech usage.
+   - Removed is_error methods.
+   - Changed default sleep to 1 second.
    - Updated mangling table.
 
 

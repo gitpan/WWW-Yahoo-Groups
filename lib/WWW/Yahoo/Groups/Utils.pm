@@ -1,9 +1,31 @@
 package WWW::Yahoo::Groups::Utils;
-our $VERSION = '1.88';
+our $VERSION = '1.89';
+
+=head1 NAME
+
+WWW::Yahoo::Groups::Utils - Sundry utility routines for WYG.
+
+=head1 DESCRIPTION
+
+This module provides miscellaneous routines to make WYG work nicely.
+
+=cut
+
 use strict;
 use warnings FATAL => 'all';
 use base qw( Exporter );
+
+=head1 EXPORTS
+
+One: get_unmangling_table
+
+=cut
+
 our @EXPORT = qw( get_unmangling_table );
+
+=head1 FUNCTIONS
+
+=cut
 
 # Unmangling code by Zainul M Charbiwala. Subsequently modified first by
 # Vadim Zeitlin and then Iain Truskett.
@@ -14,7 +36,7 @@ our @EXPORT = qw( get_unmangling_table );
 
     sub load_unmangle_data
     {
-        my $unmangle_data = <<'EOF';
+        my $unmangle_data = <<'EOF'; # {{{1
 000:O:q:?::::::s::::n::::b::::$::::Y:::::t::::f:::X::::z::}:7:::c::::X::|:,::{::Q:-:::::::::b:#:y:::.::^::::a:=::{:::m:X:2:!:F:s:::::M:8:5:::6::6:::e:::m:6:::j:h:::B::::B:::::_:T::::::::::|:::::::~:0::z:::::b::t:::::::#::::::2::S:w::R:1:::::::-::::f:::::::y:p::C:::::X::W:::2:g::c:P::b::L:::::::::::Z::y::::t::+:::::::::::::::::::::::v:::::::t
 001:::::::X::l:j:::::H:9:::U:X:N::::4:H:x:::f::::l::::::::3::::Y:::O::::6::`:::::m::y::$:::::N:|:l::::::*::t:t:5:::W:r:P:::?::::X:::N:p:+:}:::::::#:l::n:::R:::X:^::$:::Q:::J::::::D:n:6::c::::::::s:G::::H::E:E:::f:::::::t:::V:L::::::::q:::::::Y::G::::F:::::::::::I:_:J:::r:-:::::::y:::N:::c:::::::r:::::::::7:t::::::n::j:::::::::::::x
 002::::::::::::w::::::::P:1:r:::=:::::::::b:o:+:::::~:::::y::}::::R::::x:::::h:::::::{:{:u::::::`:::g:N:V::~::R:::::l:::::k:::~::C:,:::=::m:::Z:A::t:M:L::::.::7::x::!:::p:::d:T:X:X:::::G:::::::::w::V::K::v::?:::l:n:K:Y::::::::l::~:n:=:5:::t::3:1:Y::9::.:::.:K:T::::R:::::::Z:y::::u::::::::6::z:::::::j::::l
@@ -272,7 +294,7 @@ our @EXPORT = qw( get_unmangling_table );
 254:::0:b:::::=:::E:9:J::p:::M:::::c:::::::::::$::r:::::::@::s:@:%:::6:::4:::d:.:!:g:::.::::::i::::::::::::::::a::i:::P::::::i:::::::::=::::::C:::U:S::R::Z:X:2::::b:R:P::e:q:::::::6:::::::::a:::::::G:H::::::::::::q:4::::M:O::D:g:::::::1:=:0:::::::::#::::}:}::::::c:1:::::::::7:::::::Z:u::::Y:::::4
 255::::::::::::::::::::x::::::Y::::::9:::^::Q::I:Z:9:::_::6:-::h::Q::Q::::u:::s::::M::::M::b:::::V:::::::::::b:v::::::::~::::::::::@::c:}::::W::::o:d:::::::::::`:::W:Y:S:X:::Z:{:A::~:4::9:::::R:1::::@::A:::::9:::::::U:::J::::::6:#:::#:X::T:::::::::::2::t::%:::b:::j:5::::4::::::::::::::::::::::::u:::::u:::::::j::::::::::::::::::z
 EOF
-
+# }}}1
         for ( split /\n/, $unmangle_data ) {
             my ($num, $rest) = split /:/, $_, 2;
             $unmangling_table[$num] = [ split /:/, $rest ];
@@ -280,6 +302,13 @@ EOF
 
         $loaded = 1;
     }
+
+=head2 get_unmangling_table
+
+Returns a reference to an array comprising the address
+decoding table.
+
+=cut
 
     sub get_unmangling_table
     {
@@ -289,3 +318,17 @@ EOF
 }
 
 1;
+
+__DATA__
+
+=head1 BUGS, THANKS, LICENCE, etc.
+
+See L<WWW::Yahoo::Groups>
+
+=head1 AUTHOR
+
+Iain Truskett <spoon@cpan.org>
+
+=cut
+
+# vim: fdm=marker

@@ -12,9 +12,6 @@ if ($rv and ref $rv and $rv->isa('X::WWW::Yahoo::Groups::BadFetch') ) {
 } elsif ($rv) {
     fail("badfetch: unexpected error");
     diag $rv;
-} elsif ($rv->is_error) {
-    pass("badfetch: Nicely passed an error.");
-    diag "$rv";
 } else {
     fail("badfetch: Expected error, did not receive one.");
 }

@@ -1,9 +1,6 @@
-LICENSE FOR WWW::Yahoo::Groups 1.86
+LICENSE FOR WWW::Yahoo::Groups 1.87
 
-Copyright © Iain Truskett, 2002-2003. All rights reserved.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
 
 See the supplied 'Artistic' and 'COPYING' files, or
 perlartistic and perlgpl in Perl 5.8.1 or later, for

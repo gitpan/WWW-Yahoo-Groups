@@ -3,6 +3,13 @@
 # The following versions are available on CPAN:
 
 ---
+version: 1.87
+date:    26 Aug 2003
+changes:
+    - Hash randomisation problems fixed. Thanks merlyn.
+    - Corrected requirements.
+
+---
 version: 1.86
 date:    22 Aug 2003
 changes:

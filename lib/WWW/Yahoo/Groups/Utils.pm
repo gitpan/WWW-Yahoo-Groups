@@ -1,5 +1,5 @@
 package WWW::Yahoo::Groups::Utils;
-our $VERSION = '1.86';
+our $VERSION = '1.87';
 use strict;
 use warnings FATAL => 'all';
 use base qw( Exporter );

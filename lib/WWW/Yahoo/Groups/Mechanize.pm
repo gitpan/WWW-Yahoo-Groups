@@ -1,6 +1,8 @@
 package WWW::Yahoo::Groups::Mechanize;
-our $VERSION = '1.86';
-use base qw( WWW::Mechanize );
+our $VERSION = '1.87';
+our @ISA = qw( WWW::Mechanize );
+use WWW::Mechanize;
+use Net::SSL;
 use Params::Validate qw( validate_pos SCALAR );
 use strict;
 use warnings FATAL => 'all';
@@ -79,7 +81,6 @@ sub autosleep
 	my ($sleep) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
 		    'is integer' => sub { shift() =~ /^ \d+ $/x },
-		    'not negative' => sub { shift() >= 0 },
 		} }, # number
 	);
 	$w->{__PACKAGE__.'-sleep'} = $sleep;

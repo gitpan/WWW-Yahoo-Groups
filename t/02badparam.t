@@ -65,6 +65,7 @@ foreach my $key (sort keys %subs)
 	pass("$key: ".$@->error);
     } elsif ($@) {
 	fail("$key: Failed, but not the right way.");
+        diag $@;
     } else {
 	fail("$key: Did not fail, but was meant to.");
     }

@@ -91,7 +91,7 @@ As these are recognised flaws, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.86';
+our $VERSION = '1.87';
 
 use Carp;
 use HTTP::Cookies;
@@ -407,7 +407,7 @@ sub list
 			defined $_[0] and length $_[0]
 		    },
 		    'appropriate characters' => sub {
-			$_[0] =~ /^ [\w-]+ $/x;
+			defined $_[0] and $_[0] =~ /^ [\w-]+ $/x;
 		    },
 		}}, # list
 	);
@@ -587,8 +587,7 @@ sub fetch_message
     my $self = shift;
     my ($number) = validate_pos( @_,
 	{ type => SCALAR, callbacks => {
-		'is integer' => sub { shift() =~ /^ \d+ $/x },
-		'greater than zero' => sub { shift() > 0 },
+		'is positive integer' => sub { $_[0] =~ /^ (?!0+$) \d+ $/x },
 	    } }, # number
     );
     my $list = $self->list();
@@ -683,9 +682,9 @@ sub fetch_rss
     my %opts;
     @opts{qw( count )} = validate_pos( @_,
 	{ type => SCALAR, optional => 1, callbacks => {
-		'is integer' => sub { shift() =~ /^ \d+ $/x },
-		'greater than zero' => sub { shift() > 0 },
-		'less than or equal to one hundred' => sub { shift() <= 100 },
+		'is positive integer below 101' => sub {
+                    $_[0] =~ /^ (?!0+$) \d+ $/x and $_[0] <= 100
+                },
 	    } }, # number
     );
     #             href="http://groups.yahoo.com/group/rss-dev/messages?rss=1&amp;viscount=30">
@@ -825,7 +824,8 @@ exceptions.
 Aaron Straup Cope (ASCOPE) for writing L<XML::Filter::YahooGroups>
 which uses this module for retrieving message bodies to put into RSS.
 
-Randal Schwartz (MERLYN) for pointing out some problems back in 1.4.
+Randal Schwartz (MERLYN) for pointing out some problems back in 1.4
+and noting problems caused by the hash randomisation.
 
 Ray Cielencki (SLINKY) for C<first_msg_id> and "Age Restricted" notice
 bypassing.
@@ -857,7 +857,12 @@ the number of any messages you are having trouble with.
 Copyright E<copy> Iain Truskett, 2002-2003. All rights reserved.
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the same terms as Perl itself, either Perl version 5.000 or,
+at your option, any later version of Perl 5 you may have available.
+
+The full text of the licenses can be found in the F<Artistic> and
+F<COPYING> files included with this module, or in L<perlartistic> and
+L<perlgpl> as supplied with Perl 5.8.1 and later.
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use Module::Build 0.11;
 
 my $m = Module::Build->new(
     dist_name => 'WWW-Yahoo-Groups',
-    dist_version => '1.6',
+    dist_version => '1.7',
     license => 'perl',
 
     requires => {
@@ -19,7 +19,11 @@ my $m = Module::Build->new(
     },
     build_requires => {
 	'Test::More'       => 0.47,
+	'Test::Prereq' => 0.11,
+	'Test::Prereq::Build' => 0.03,
     },
+
+    verbose => 1,
 );
 
 $m->create_build_script;

@@ -1,0 +1,9 @@
+^Build$
+/CVS/
+^WWW-Yahoo-Groups-
+^diffs$
+^CVS/
+^Makefile$
+^_build/
+^blib/
+^.cvsignore$

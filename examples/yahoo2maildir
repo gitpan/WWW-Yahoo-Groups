@@ -4,30 +4,33 @@ use 5.006;
 use WWW::Yahoo::Groups;
 use File::Slurp;
 
-my $user = 'someusername';
-my $pass = 'somepassword';
-my $group = 'somegroupname'; # Casing is important.
-my $min = 1;
-my $max = 2000;
-my $dir = 'jp';
-
+my $user  = 'someusername';
+my $pass  = 'somepassword';
+my $group = 'somegroupname';    # Casing is important.
+my $min   = 1;
+my $max   = 2000;
+my $dir   = 'jp';               # Maildir name
 
 my $w = WWW::Yahoo::Groups->new();
 
 # Sign in page
 $w->login( $user => $pass );
 $w->list( $group );
-$w->requests_redirectable( [] ); # no redirects now
+$w->requests_redirectable( [] );    # no redirects now
 
 mkdir $dir;
 mkdir "$dir/$_" for (qw( tmp new cur ));
 
 # Get messages
-for ($min..$max)
+for my $number ( $min .. $max )
 {
-    my $fname = "$dir/new/${_}.$group";
+    my $fname = "$dir/new/$number.$group";
     next if -f $fname;
-    my $content = $w->fetch_message($_);
-    write_file($fname, $content);
-    sleep 20;
+    my $content = eval { $w->fetch_message( $number ) };
+    if ( $@ and $@->isa('X::WWW::Yahoo::Groups') ) {
+        warn "Could not handle message $num: ", $@->error, "\n";
+    } else {
+        write_file( $fname, $content );
+        sleep 20;
+    }
 }

@@ -1,14 +1,22 @@
-Build.PL
-Changes
+README                          Basic information about this module
+SIGNATURE                       Cryptographic signature of these files
+Changes                         List of changes made in each revision
+INSTALL                         Installation instructions
+TODO                            Things yet to do to the module
+LICENSE                         License and copyright
+Artistic                        The Artistic Licence
+GPL                             The GNU Public License
+Build.PL                        Script to make/install the module
+Makefile.PL                     Wrapper to call Build.PL
 MANIFEST			This list of files
-META.yaml
-Makefile.PL
-README
-SIGNATURE
-examples/yahoo2maildir
-lib/WWW/Yahoo/Groups.pm
-t/00load.t
-t/01login.t
-t/02badparam.t
-t/03message.t
-t/04rss.t
+META.yaml                       Module metadata
+examples/yahoo2maildir          An example program
+lib/WWW/Yahoo/Groups.pm         The module
+t/00load.t                      Test that the module loads
+t/00prereqs.t                   Test prequisites are appropriate
+t/00checkyaml.t                 Test files are well formed and appropriate
+t/01login.t                     Test we can't login with bad id
+t/02badparam.t                  Test we can't given functions bad parameters
+t/03message.t                   Test we can retrieve messages
+t/04rss.t                       Test we can retrieve RSS
+MANIFEST.SKIP                   Which files to never put in here

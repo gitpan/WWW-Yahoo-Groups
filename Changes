@@ -1,16 +1,70 @@
-Change log for WWW::Yahoo::Groups
+# Change log for WWW::Yahoo::Groups
 
-1.6 - Aaron Straup Cope wrote a module to play with Yahoo RSS.
+---
+version: 1.7
+date:    08 Oct 2002
+changes:
+    - Added Test::Prereq::Build to tests. [ Hi brian d foy ]
+    - Throw exception if message missing from archive.
+    - This file now in YAML =)  [ Hi Ingy ]
+    - Assorted build checks in tests.
+    - INSTALL added. Gives a nice rundown of how to install the module.
+    - New tests to verify YAML files are valid and up to date.
+    - Mention search.cpan.org URL in README
+    - Example program improved for new exceptions, and tidied.
+    - Mention message number of message failing anything.
+    - Fix exception type in fetching test.
+    - Add test to fetch a message that doesn't exist.
+    - Added MANIFEST.SKIP with appropriate entries.
+    - Added .cvsignore (not that most people will see it).
+    - Added TODO file (also YAML).
+    - Added comments to test files.
+    - >
+      Test suite reports information on the installed modules.
+      Useful for when debugging failed tests on other machines.
+    - Exceptions appropriately documented.
+    - Mentioned a few other bits in the SEE ALSO part of the POD.
+    - LICENSE and COPYRIGHT section added to POD.
+    - INSTALL, LICENSE and README files generated from templates.
+    - GPL and Artistic license files included.
+    - MANIFEST file given comments on the purpose of each file.
+    - It's been a fun release, hasn't it?
+
+---
+version: 1.6
+date:    03 Oct 2002
+changes:
+    - Aaron Straup Cope wrote a module to play with Yahoo RSS.
     - So I added a bit to get the RSS in an abstract fashion.
 
-1.5 - But it helps to not mess up the MB scripts. Ta Merlyn.
+---
+version: 1.5
+date:    02 Oct 2002
+changes:
+    - But it helps to not mess up the MB scripts. Ta Merlyn.
 
-1.4 - Module::Build is nicer than MM
+---
+version: 1.4
+date:    02 Oct 2002
+changes:
+    - Module::Build is nicer than MM
 
-1.3 - Added SIGNATURE (Module::Signature)
+---
+version: 1.3
+date:    01 Oct 2002
+changes:
+    - Added SIGNATURE (Module::Signature)
     - Added example program.
     - Refined doco.
 
-1.2 - More tests, more exceptions, param validation.
+---
+version: 1.2
+date:    01 Oct 2002
+changes:
+    - More tests, more exceptions, param validation.
 
-1.1 - initial (crappy) release.
+---
+version: 1.1
+date:    29 Sep 2002
+changes:
+    - Initial (crappy) release.

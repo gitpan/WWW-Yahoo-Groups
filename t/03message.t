@@ -1,4 +1,4 @@
-use Test::More tests => 9;
+use Test::More tests => 10;
 BEGIN { use_ok 'WWW::Yahoo::Groups' }
 
 my $w = WWW::Yahoo::Groups->new();
@@ -6,8 +6,10 @@ my $w = WWW::Yahoo::Groups->new();
 isa_ok( $w => 'WWW::Yahoo::Groups' );
 isa_ok( $w => 'WWW::Mechanize' );
 
+# Our special user
 $w->login( 'perligain7ya5h00grrzogups' => 'redblacktrees' );
 
+# Our special list
 my $list = eval {
     $w->list( 'www_yaho_t' );
     return $w->list();
@@ -21,6 +23,7 @@ if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
 }
 is($list => 'www_yaho_t' => 'List set correctly.');
 
+# Fetch message 1 - a message with no attachment
 {
     my $no_attach = eval
     {
@@ -72,7 +75,7 @@ EOF
     {
 	$w->fetch_message( 2 )
     };
-    if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups::BadParam')) {
+    if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
 	fail("fetch 2 failed ".$@->error);
     } elsif ($@) {
 	fail("fetch 2 failed, for some reason.");
@@ -147,4 +150,20 @@ hYNlSCsO1kPwmOUTPp/x1Fg=
 EOF
 
     is ($attach => $second_body, 'Retrieved message 2 correctly');
+}
+
+# Third message, non-existent
+{
+    my $attach = eval
+    {
+	$w->fetch_message( 242390 )
+    };
+    if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups::NotThere')) {
+	pass("fetch 3 failed ".$@->error);
+    } elsif ($@) {
+	fail("fetch 3 failed, for some reason.");
+	diag $@;
+    } else {
+	fail("fetch 3 succeeded. Should not have");
+    }
 }

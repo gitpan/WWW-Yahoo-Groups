@@ -6,8 +6,10 @@ my $w = WWW::Yahoo::Groups->new();
 isa_ok( $w => 'WWW::Yahoo::Groups' );
 isa_ok( $w => 'WWW::Mechanize' );
 
+# Our special user, as usual
 $w->login( 'perligain7ya5h00grrzogups' => 'redblacktrees' );
 
+# Our special list
 my $list = eval {
     $w->list( 'www_yaho_t' );
     return $w->list();
@@ -21,6 +23,7 @@ if ($@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups')) {
 }
 is($list => 'www_yaho_t' => 'List set correctly.');
 
+# Get a supposedly valid RSS feed
 {
     my $rsscontent = eval
     {
@@ -37,8 +40,9 @@ is($list => 'www_yaho_t' => 'List set correctly.');
 }
 
 
-# Bad fetch
+# Try for a bad fetch
 {
+    # This list shouldn't exist
     my $list = eval {
 	$w->list( 'www_yaho_txmg' );
 	return $w->list();

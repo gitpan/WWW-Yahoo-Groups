@@ -13,6 +13,19 @@ WWW::Yahoo::Groups - automated access to Yahoo! Groups.
     $y->list( 'Jade_Pagoda' );
     my $email = $y->fetch_message( 2345 );
 
+    # Error catching
+    my $email = eval { $y->fetch_message( 93848 ) };
+    if ( $@ and ref $@ and $@->isa('X::WWW::Yahoo::Groups') )
+    {
+        warn "Problem: ".$@->error;
+    }
+
+=head1 ABSTRACT
+
+C<WWW::Yahoo::Groups> retrieves messages from the archive of Yahoo
+Groups. It provides a simple OO interface to logging in and retrieving
+said messages which you may then do with as you will.
+
 =head1 DESCRIPTION
 
 C<WWW::Yahoo::Groups> is a subclass of C<WWW::Mechanize>, overriding a
@@ -24,6 +37,9 @@ It is recommended that you use this only if you're the moderator of a
 group, else you will get munged email addresses for everything. If
 there's sufficient demand for semi-automatic address demunging, I'll
 add it.
+
+All exceptions are subclasses of C<X::WWW::Yahoo::Groups>, itself a
+subclass of C<Exception::Class>.
 
 =head2 Things it does
 
@@ -55,15 +71,23 @@ doesn't understand something.
 
 =item *
 
-Handle errors.
+B<Handle errors.> Well, it does, but not as gracefully as it might in
+some situations.
+
+=item *
+
+B<Header restoration.> I've found that some groups' archives have
+unusually corrupted headers. Evidently it would be beneficial to
+restore these headers. As far as I can tell, it comes from not
+being a moderator on the lists in question.
 
 =back
 
-As these are recognised flaws, they are on the L</TODO> list.
+As this is a recognised flaw, they are on the F<TODO> list.
 
 =cut
 
-our $VERSION = '1.60';
+our $VERSION = '1.70';
 
 use base 'WWW::Mechanize';
 use Carp;
@@ -89,6 +113,10 @@ use Exception::Class (
     'X::WWW::Yahoo::Groups::UnexpectedPage' => {
 	isa => 'X::WWW::Yahoo::Groups',
 	description => 'We received a page that I do not understand',
+    },
+    'X::WWW::Yahoo::Groups::NotThere' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'The message you wanted is not in the archive',
     },
     'X::WWW::Yahoo::Groups::BadFetch' => {
 	isa => 'X::WWW::Yahoo::Groups',
@@ -151,7 +179,9 @@ the URL.
 
     $y->get( 'http://groups.yahoo.com' );
 
-Generally, you won't need to use this method.
+Generally, you won't need to use this method. It's used by a number of
+the othe rmethods and will throw a C<X::WWW::Yahoo::Groups::BadFetch> if
+it is unable to retrieve the specified page.
 
 =cut
 
@@ -191,6 +221,26 @@ sub field {
 Logs the robot into the Yahoo! Groups system.
 
     $y->login( $user => $passwd );
+
+May throw:
+
+=over 4
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadFetch> if it cannot fetch any of the
+appropriate pages.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadLogin> is unable to log in for some reason
+(error will be given the text of the Yahoo error).
+
+=back
 
 =cut
 
@@ -236,6 +286,8 @@ cases it. If not, you may experience odd behaviour.
     $y->list( 'Jade_Pagoda' );
     my $list = $y->list();
 
+May throw C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
+
 =cut
 
 sub list
@@ -244,7 +296,9 @@ sub list
     if (@_) {
 	my ($list) = validate_pos( @_,
 	    { type => SCALAR, callbacks => {
-		    'defined and of length' => sub { defined $_[0] and length $_[0] },
+		    'defined and of length' => sub {
+			defined $_[0] and length $_[0]
+		    },
 		}}, # list
 	);
 	$w->{__PACKAGE__.'-list'} = $list;
@@ -259,8 +313,36 @@ a mail message (with headers) suitable for saving into a Maildir.
 
     my $message = $y->fetch_message( 435 );
 
-You will probably experience problems if you retrieve messages with
-attachments.
+May throw any of:
+
+=over 4
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadFetch> if it cannot fetch any of the
+appropriate pages.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::BadParam> if given invalid parameters.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::NoListSet> if no list is set.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::UnexpectedPage> if we fetched a page and it was
+not what we thought it was meant to be.
+
+=item *
+
+C<X::WWW::Yahoo::Groups::NotThere> if the message does not exist in the
+archive (any of deleted, never archived or you're beyond the range of
+the group).
+
+=back
+
 
 =cut
 
@@ -297,19 +379,32 @@ sub fetch_message
 	$content = $res->content;
     }
 
-    # Strip header
-    $content =~ s/ ^ .*? \Q<!-- start content include -->\E //smx and
-    $content =~ s/ ^ .*? <table[^>]+> \s+ <tt> //smx and
+    # See if it's a missing article.
+    if ($content =~ m!
+	<blockquote>
+	\s+
+	<br>
+	\s+
+	\QMessage $number does not exist in $list\E
+	</blockquote>
+	!smx)
+    {
+	X::WWW::Yahoo::Groups::NotThere->throw("Message $number is not there.");
+    }
 
-    # Strip footer
+    # Strip content boundaries
+    $content =~ s/ ^ .*? \Q<!-- start content include -->\E //smx and
     $content =~ s/ \Q<!-- end content include -->\E .* $ //smx and
+
+    # Strip table wrappings
+    $content =~ s/ ^ .*? <table[^>]+> \s+ <tt> //smx and
     $content =~ s! </tt> \s+ </table> .* $ !!smx and
 
     # Munge content
     $content =~ s!  <a \s+ href=" [^"]+ "> ([^<]+) </a> !$1!smgx and
     $content =~ s/ <BR> //smgx or
 	X::WWW::Yahoo::Groups::UnexpectedPage->throw(
-	    "Message doesn't appear to be formatted as we like it.");
+	    "Message $number doesn't appear to be formatted as we like it.");
     decode_entities($content);
 
     # Return
@@ -365,12 +460,20 @@ Randal "Merlyn" Schwartz for pointing out some problems back in 1.4.
 Please report bugs at <bug-www-yahoo-groups@rt.cpan.org>
 or via the web interface at L<http://rt.cpan.org>
 
+=head1 LICENSE AND COPYRIGHT
+
+Copyright E<copy> Iain Truskett, 2002. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 =head1 AUTHOR
 
 Iain Truskett <spoon@cpan.org>
 
 =head1 SEE ALSO
 
-L<perl>, L<WWW::Mechanize>, L<XML::Filter::YahooGroups>
+L<perl>, L<WWW::Mechanize>, L<XML::Filter::YahooGroups>,
+L<Exception::Class>, L<http://groups.yahoo.com/>.
 
 =cut

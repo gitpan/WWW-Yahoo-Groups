@@ -20,7 +20,12 @@ few methods and supplying a few extra. As such, any method available in
 C<WWW::Mechanize> is available to C<WWW::Yahoo::Groups>, perhaps
 augmented with extra features.
 
-=head2 Things it will do
+It is recommended that you use this only if you're the moderator of a
+group, else you will get munged email addresses for everything. If
+there's sufficient demand for semi-automatic address demunging, I'll
+add it.
+
+=head2 Things it does
 
 =over 4
 
@@ -33,15 +38,15 @@ Handle access restricted archives. It lets you login.
 Handle the intermittent advertisements. It notes that it got one and
 progresses straight to the message.
 
-=back
-
-=head2 Things it won't do (yet)
-
-=over 4
-
 =item *
 
-Handle attachments.
+Handle attachments. We get the source which happens to be the raw stuff.
+
+=back
+
+=head2 Things it is yet to do
+
+=over 4
 
 =item *
 
@@ -57,6 +62,37 @@ use base 'WWW::Mechanize';
 use Carp;
 use HTTP::Cookies;
 use HTML::Entities;
+use Params::Validate qw( :all );
+use Exception::Class (
+    'X::WWW::Yahoo::Groups' => {
+	description => 'An error related to WWW::Yahoo::Groups'
+    },
+    'X::WWW::Yahoo::Groups::BadParam' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'Invalid parameters specified for function',
+    },
+    'X::WWW::Yahoo::Groups::BadLogin' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'For some reason, your login failed',
+    },
+    'X::WWW::Yahoo::Groups::NoListSet' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'You tried accessing a method that required the list to be set',
+    },
+    'X::WWW::Yahoo::Groups::UnexpectedPage' => {
+	isa => 'X::WWW::Yahoo::Groups',
+	description => 'We received a page that I do not understand',
+    },
+);
+
+Params::Validate::validation_options(
+    ignore_case => 1,
+    strip_leading => 1,
+    on_fail => sub {
+	chomp($_[0]);
+	X::WWW::Yahoo::Groups::BadParam->throw($_[0]);
+    }
+);
 
 =head1 METHODS
 
@@ -145,13 +181,32 @@ Logs the robot into the Yahoo! Groups system.
 sub login
 {
     my $w = shift;
-    my ($user, $passwd) = @_;
+    my %p;
+    @p{qw( user pass )} = validate_pos( @_,
+	{ type => SCALAR, }, # user
+	{ type => SCALAR, }, # pass
+    );
+
     $w->get('http://groups.yahoo.com/');
     $w->follow('Sign in');
-    $w->field( login => $user );
-    $w->field( passwd => $passwd );
+    $w->field( login => $p{user} );
+    $w->field( passwd => $p{pass} );
     $w->click();
-    $w->follow('here');
+    my $result = $w->{res}->content;
+    if (my ($error) = $result =~ m!
+	    \Q<font color=red face=arial><b>\E
+	    \s+
+	    (.*?)
+	    \s+
+	    \Q</b></font></td></tr></table>\E
+	!xsm)
+    {
+	X::WWW::Yahoo::Groups::BadLogin->throw($error);
+    }
+    else
+    {
+	$w->follow('here');
+    }
     return 1;
 }
 
@@ -171,7 +226,11 @@ sub list
 {
     my $w = shift;
     if (@_) {
-	my $list = shift;
+	my ($list) = validate_pos( @_,
+	    { type => SCALAR, callbacks => {
+		    'defined and of length' => sub { defined $_[0] and length $_[0] },
+		}}, # list
+	);
 	$w->{__PACKAGE__.'-list'} = $list;
     }
     return $w->{__PACKAGE__.'-list'};
@@ -192,14 +251,22 @@ attachments.
 sub fetch_message
 {
     my $w = shift;
-    my $number = shift;
+    my ($number) = validate_pos( @_,
+	{ type => SCALAR, callbacks => {
+		'is integer' => sub { shift() =~ /^ \d+ $/x },
+		'greater than zero' => sub { shift() > 0 },
+	    } }, # number
+    );
     my $list = $w->list();
-    croak "No list set." unless defined $list and length $list;
+    X::WWW::Yahoo::Groups::NoListSet->throw("Cannot fetch a message without a list being specified.")
+	unless defined $list and length $list;
     my $template = "http://groups.yahoo.com/group/$list/message/%d?source=1&unwrap=1";
     $w->get(sprintf $template, $number);
     my $res = $w->{res};
     while ($res->is_redirect)
     {
+	# We do this manually because it doesn't work automatically for
+	# some reason. I suspect we hit a redirection limit in LWP.
 	my $url = $res->header('Location');
 	$w->get($url);
 	$res = $w->{res};
@@ -207,22 +274,26 @@ sub fetch_message
     my $content = $res->content;
     if ($content =~ /\QYahoo! Groups is an advertising supported service.\E/gsm)
     {
+	# If it's one of those damn interrupting ads, then click
+	# through.
 	$w->follow('Continue to message');
 	$res = $w->{res};
 	$content = $res->content;
     }
 
     # Strip header
-    $content =~ s/ ^ .*? \Q<!-- start content include -->\E //smx;
-    $content =~ s/ ^ .*? <table[^>]+> \s+ <tt> //smx;
+    $content =~ s/ ^ .*? \Q<!-- start content include -->\E //smx and
+    $content =~ s/ ^ .*? <table[^>]+> \s+ <tt> //smx and
 
     # Strip footer
-    $content =~ s/ \Q<!-- end content include -->\E .* $ //smx;
-    $content =~ s! </tt> \s+ </table> .* $ !!smx;
+    $content =~ s/ \Q<!-- end content include -->\E .* $ //smx and
+    $content =~ s! </tt> \s+ </table> .* $ !!smx and
 
     # Munge content
-    $content =~ s!  <a \s+ href=" [^"]+ "> ([^<]+) </a> !$1!smgx;
-    $content =~ s/ <BR> //smgx;
+    $content =~ s!  <a \s+ href=" [^"]+ "> ([^<]+) </a> !$1!smgx and
+    $content =~ s/ <BR> //smgx or
+	X::WWW::Yahoo::Groups::UnexpectedPage->throw(
+	    "Message doesn't appear to be formatted as we like it.");
     decode_entities($content);
 
     # Return
@@ -239,10 +310,6 @@ __END__
 =item *
 
 Do some sanity checking on results from the fetches.
-
-=item *
-
-Handle attachments.
 
 =item *
 
